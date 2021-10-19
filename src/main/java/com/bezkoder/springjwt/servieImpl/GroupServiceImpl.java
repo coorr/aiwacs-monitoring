@@ -44,44 +44,68 @@ public class GroupServiceImpl implements GroupService {
         ObjectMapper mapper = new ObjectMapper();
         
         List<Object> resultList = new ArrayList<Object>();
-        List<Group> groupList = groupRepository.getGroup();
+        List<Group> groupList = groupRepository.getGroup();  // 0 그룹 출력
         
         
-        for(Group g: groupList) {
+        for(Group g: groupList) {    // depth 0 
             Map<String, Object> groupMap = new HashMap<String, Object>();
             List<Object> chilrentStrings = new ArrayList<Object>();
             
-            groupMap.put("key", g.getId());
-            groupMap.put("title", g.getTreeName());
-            groupMap.put("isLeaf", false);
-            groupMap.put("children",chilrentStrings );
-            resultList.add(groupMap);
+            if(g.getParent() == null) {
+                groupMap.put("key", g.getId()+"-");
+                groupMap.put("title", g.getTreeName());
+                groupMap.put("isLeaf", false);
+                groupMap.put("children",chilrentStrings );
+                resultList.add(groupMap);
+            }
+            List<Group> childrenList = groupRepository.getGroupSecond(g.getId());  // depth 1
             
-//            List<GroupChildren> childrenList = groupChildrenRepository.getGroupChildren(g.getId());
-//            
-//            if(childrenList.size() > 0) {
-//               for(GroupChildren c: childrenList) {
-//                	Map<String, Object> childrenMap = new HashMap<String, Object>();
-//                	List<Object> secondChildren = new ArrayList<Object>();
-//                	childrenMap.put("key", c.getId());
-//                	childrenMap.put("title", c.getTreeName());
-//                	childrenMap.put("isLeaf", false);
-////                	childrenMpa.put("rootId", )
-//                	childrenMap.put("children",secondChildren );
-//                    
-//                    List<Equipment> childrenEquipments = groupChildrenRepository.getGroupChildrenEquipment(c.getId());
-//                    
-//                    if(childrenEquipments.size() > 0 ) {
-//                    	for(Equipment e2: childrenEquipments) {
-//                          Map<String, Object> childrenEquipmentMap = new HashMap<String, Object>();
-//                          childrenEquipmentMap.put("key", e2.getId());
-//                          childrenEquipmentMap.put("title", e2.getEquipment());
-//                          secondChildren.add(childrenEquipmentMap);
-//                    	}
-//                    }
-//                    chilrentStrings.add(childrenMap);
-//               }
-//            }
+            if(childrenList.size() > 0) {
+               for(Group c: childrenList) {
+                	Map<String, Object> childrenMap = new HashMap<String, Object>();
+                	List<Object> secondChildren = new ArrayList<Object>();
+                	childrenMap.put("key", c.getId()+"-");   
+                	childrenMap.put("title", c.getTreeName());
+                	childrenMap.put("isLeaf", false);
+                	childrenMap.put("children",secondChildren );
+                    
+                	List<Group> childrenList3 = groupRepository.getGroupSecond(c.getId());  // depth 2
+                	
+                	for(Group c3: childrenList3 ) {
+                	    Map<String, Object> childrenMap3 = new HashMap<String, Object>();
+                        List<Object> secondChildren3 = new ArrayList<Object>();
+                        childrenMap3.put("key", c3.getId()+"-");
+                        childrenMap3.put("title", c3.getTreeName());
+                        childrenMap3.put("isLeaf", false);
+                        childrenMap3.put("children",secondChildren3 );
+                        
+                        List<Equipment> equipment = groupRepository.getEquipment(c3.getId());  // depth 3
+                	
+                        if(equipment.size() > 0 ) {
+                            for(Equipment e3: equipment) {
+                              Map<String, Object> childrenEquipmentMap3 = new HashMap<String, Object>();
+                              childrenEquipmentMap3.put("key", e3.getId());
+                              childrenEquipmentMap3.put("title", e3.getEquipment());
+                              secondChildren3.add(childrenEquipmentMap3);
+                            }
+                        }
+                        secondChildren.add(childrenMap3);
+                	}
+                	
+                	
+                	List<Equipment> equipment = groupRepository.getEquipment(c.getId());
+                	
+                    if(equipment.size() > 0 ) {
+                    	for(Equipment e2: equipment) {
+                          Map<String, Object> childrenEquipmentMap = new HashMap<String, Object>();
+                          childrenEquipmentMap.put("key", e2.getId());
+                          childrenEquipmentMap.put("title", e2.getEquipment());
+                          secondChildren.add(childrenEquipmentMap);
+                    	}
+                    }
+                    chilrentStrings.add(childrenMap);
+               }
+            }
             
             List<Equipment> equipment = groupRepository.getEquipment(g.getId());
             
