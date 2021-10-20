@@ -86,6 +86,13 @@ public class GroupServiceImpl implements GroupService {
                               Map<String, Object> childrenEquipmentMap3 = new HashMap<String, Object>();
                               childrenEquipmentMap3.put("key", e3.getId());
                               childrenEquipmentMap3.put("title", e3.getEquipment());
+                              childrenEquipmentMap3.put("settingIp", e3.getSettingIp());
+                              childrenEquipmentMap3.put("settingOs", e3.getSettingOs());
+                              childrenEquipmentMap3.put("settingPerson", e3.getSettingPerson());
+                              childrenEquipmentMap3.put("settingTemplate", e3.getSettingTemplate());
+                              childrenEquipmentMap3.put("settingActive", e3.isSettingActive());
+                              childrenEquipmentMap3.put("settingProxy", e3.getSettingProxy());
+                              childrenEquipmentMap3.put("settingType", e3.getSettingType());
                               secondChildren3.add(childrenEquipmentMap3);
                             }
                         }
@@ -100,6 +107,13 @@ public class GroupServiceImpl implements GroupService {
                           Map<String, Object> childrenEquipmentMap = new HashMap<String, Object>();
                           childrenEquipmentMap.put("key", e2.getId());
                           childrenEquipmentMap.put("title", e2.getEquipment());
+                          childrenEquipmentMap.put("settingIp", e2.getSettingIp());
+                          childrenEquipmentMap.put("settingOs", e2.getSettingOs());
+                          childrenEquipmentMap.put("settingPerson", e2.getSettingPerson());
+                          childrenEquipmentMap.put("settingTemplate", e2.getSettingTemplate());
+                          childrenEquipmentMap.put("settingActive", e2.isSettingActive());
+                          childrenEquipmentMap.put("settingProxy", e2.getSettingProxy());
+                          childrenEquipmentMap.put("settingType", e2.getSettingType());
                           secondChildren.add(childrenEquipmentMap);
                     	}
                     }
@@ -114,6 +128,13 @@ public class GroupServiceImpl implements GroupService {
                   Map<String, Object> equipmentMap = new HashMap<String, Object>();
                   equipmentMap.put("key", e.getId());
                   equipmentMap.put("title", e.getEquipment());
+                  equipmentMap.put("settingIp", e.getSettingIp());
+                  equipmentMap.put("settingOs", e.getSettingOs());
+                  equipmentMap.put("settingPerson", e.getSettingPerson());
+                  equipmentMap.put("settingTemplate", e.getSettingTemplate());
+                  equipmentMap.put("settingActive", e.isSettingActive());
+                  equipmentMap.put("settingProxy", e.getSettingProxy());
+                  equipmentMap.put("settingType", e.getSettingType());
                   chilrentStrings.add(equipmentMap); 
                }
             }  
