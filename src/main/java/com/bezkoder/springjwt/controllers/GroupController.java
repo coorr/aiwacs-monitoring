@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class GroupController {
 	private final GroupService groupService;
 	
 	@GetMapping("/group/getGroupEquipment")
-	public List<Object> getGroupEquipment() {
+	public List<Object> getGroupEquipment() throws IOException  {
 	    return groupService.getGroupEquipment();
 	}
 	
@@ -83,6 +84,17 @@ public class GroupController {
     public void insertGroupSecond(@RequestBody Group group) {
         groupService.insertGroupSecond(group);
     }
+	
+	@GetMapping("/group/filterType/{equipType}/{equipCatagory}")
+	public List<Object> searchFilterGroup(@PathVariable("equipType") String equipType, @PathVariable("equipCatagory") String equipCatagory) {
+	    return groupService.searchFilterGroup(equipType,equipCatagory);
+	}
+	
+	@PostMapping("/group/deleteGroupEquipByNo/{equipId}")
+	public void deleteGroupEquipByNo(@PathVariable("equipId") String equipId) {
+	        groupService.deleteGroupEquipByNo(equipId);
+	}
+      
 	
 	
 	

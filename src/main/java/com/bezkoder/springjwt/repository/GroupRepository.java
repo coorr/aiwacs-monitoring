@@ -25,8 +25,8 @@ public interface GroupRepository  extends JpaRepository<Group, Integer> {
     @Query("select j from GroupEquipmentJoin j where j.group_id =:id ")
     List<GroupEquipmentJoin> getGroupEquipmentJoin(@Param("id") Integer id);
     
-    @Query("select e from Equipment e where e.id not in (select g.equipment_id from GroupEquipmentJoin g) AND e.deletedFlag = true order by e.id desc ") //  
-    List<Equipment>  unGroupEquipment();
+    @Query("select e from Equipment e where e.id not in (select g.equipment_id from GroupEquipmentJoin g) AND e.deletedFlag = true order by e.id asc ") //  
+    List<Equipment> unGroupEquipment();
     
     @Modifying(clearAutomatically=true)
     @Query("delete from Group g where g.id in (:id)")
@@ -49,6 +49,14 @@ public interface GroupRepository  extends JpaRepository<Group, Integer> {
     
     @Query("select g from Group g where g.parent =:id order by g.id asc ")
     List<Group> getGroupSecond(@Param("id")Integer id);
+    
+    @Query("select e,j from Equipment e, GroupEquipmentJoin j where e.id = j.equipment_id and j.group_id =:id "
+            + "and e.deletedFlag = true and e.settingType in (:equipTypes) and e.settingCatagory in (:equipCatagorys) order by e.id asc ") 
+    List<Equipment> searchFilterGroup(@Param("id") Integer id, @Param("equipTypes") String[] equipTypes, @Param("equipCatagorys") String[] equipCatagorys);
+
+    @Modifying(clearAutomatically=true)
+    @Query("delete from GroupEquipmentJoin j where j.equipment_id in (:id)")
+    Integer deleteGroupEquipByNo(@Param("id") int[] id);
 
 
 }
