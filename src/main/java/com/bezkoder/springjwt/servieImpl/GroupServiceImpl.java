@@ -38,6 +38,7 @@ import javassist.expr.NewArray;
 import lombok.RequiredArgsConstructor;
 
 //json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resultList);
+//ObjectMapper mapper = new ObjectMapper();
 
 @Service
 @RequiredArgsConstructor

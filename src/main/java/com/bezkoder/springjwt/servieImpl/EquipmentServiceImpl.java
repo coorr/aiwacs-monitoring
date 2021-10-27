@@ -3,6 +3,7 @@ package com.bezkoder.springjwt.servieImpl;
 
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,11 +30,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bezkoder.springjwt.common.Constants;
 import com.bezkoder.springjwt.models.Equipment;
+import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.payload.request.EquipmentRequest;
 import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.EquipmentRepository;
+import com.bezkoder.springjwt.repository.HistoryRecordRepository;
 import com.bezkoder.springjwt.service.EquipmentService;
 
 import lombok.RequiredArgsConstructor;
@@ -44,6 +48,7 @@ import lombok.RequiredArgsConstructor;
 public class EquipmentServiceImpl implements EquipmentService{
 
 	private final EquipmentRepository equipmentRepository;
+	private final HistoryRecordRepository historyRecordRepository;
 
 	@Transactional
     @Override
@@ -73,6 +78,16 @@ public class EquipmentServiceImpl implements EquipmentService{
                 );
         equipmentRepository.save(equipment);
         
+        HistoryRecord historyRecord = new HistoryRecord();
+//        historyRecord.setUserName(historyRecord.getUserName());
+        historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
+//        historyRecord.setMenuDepth1(historyRecord.getMenuDepth1());
+//        historyRecord.setSettingIp(historyRecord.getSettingIp());
+        historyRecord.setPageURL(Constants.STATUS_URL_GROUPDEVICEMANAGE);
+        historyRecord.setTargetName(equipmentRequest.getEquipment());
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
         return null;
     }
 	

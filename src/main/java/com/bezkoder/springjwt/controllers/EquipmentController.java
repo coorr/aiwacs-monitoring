@@ -4,10 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -22,6 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,10 +42,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.bezkoder.springjwt.models.Equipment;
+import com.bezkoder.springjwt.models.HistoryRecord;
+import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.EquipmentRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.EquipmentRepository;
+import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 import com.bezkoder.springjwt.service.EquipmentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,12 +60,47 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EquipmentController {
 	
+ 
 	private final EquipmentService equipmentService;
 	
 
 	@PostMapping("/equipment")
-	public ResponseEntity<?> createEquipment(@RequestBody EquipmentRequest equipmentRequest) {
-		return equipmentService.createEquipment(equipmentRequest);	
+	public ResponseEntity<?> createEquipment(@RequestBody EquipmentRequest equipmentRequest,HttpServletRequest request) {
+	    ObjectMapper mapper = new ObjectMapper();
+	   
+
+	    //	   try {
+//	        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(principal);
+//	        System.out.println(json);
+//	    } catch (JsonProcessingException e) {
+//	        e.printStackTrace();
+//	    }
+//	   if(principal instanceof UserDetailsImpl) {
+//	       String name = principal.getUsername();
+//	       System.out.println(name);
+//	   } 
+//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//	    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();   
+//	    System.out.println(userDetails.getUsername());
+	    
+//	    Object authentication = SecurityContextHolder.getContext().getAuthentication().getName();
+//	    try {
+//            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(authentication);
+//            System.out.println(json);
+//        } catch (JsonProcessingException e) {
+//        }
+	    
+	    
+	    
+	   
+	   
+
+	   
+	   
+	   
+	   
+
+	   return equipmentService.createEquipment(equipmentRequest);	
 	}
 	
 	@GetMapping("/getEquipment")

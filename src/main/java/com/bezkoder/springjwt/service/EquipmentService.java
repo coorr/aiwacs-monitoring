@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 
 import com.bezkoder.springjwt.models.Equipment;
+import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.payload.request.EquipmentRequest;
 
 public interface EquipmentService {
