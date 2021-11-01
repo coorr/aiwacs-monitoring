@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
@@ -23,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -48,6 +50,7 @@ import com.bezkoder.springjwt.payload.request.EquipmentRequest;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.EquipmentRepository;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import com.bezkoder.springjwt.security.services.UserDetailsServiceImpl;
 import com.bezkoder.springjwt.service.EquipmentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,42 +66,15 @@ public class EquipmentController {
  
 	private final EquipmentService equipmentService;
 	
+	@Autowired
+    private UserDetailsServiceImpl userDetailsService;
+	
 
 	@PostMapping("/equipment")
 	public ResponseEntity<?> createEquipment(@RequestBody EquipmentRequest equipmentRequest,HttpServletRequest request) {
 	    ObjectMapper mapper = new ObjectMapper();
 	   
 
-	    //	   try {
-//	        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(principal);
-//	        System.out.println(json);
-//	    } catch (JsonProcessingException e) {
-//	        e.printStackTrace();
-//	    }
-//	   if(principal instanceof UserDetailsImpl) {
-//	       String name = principal.getUsername();
-//	       System.out.println(name);
-//	   } 
-//	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//	    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();   
-//	    System.out.println(userDetails.getUsername());
-	    
-//	    Object authentication = SecurityContextHolder.getContext().getAuthentication().getName();
-//	    try {
-//            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(authentication);
-//            System.out.println(json);
-//        } catch (JsonProcessingException e) {
-//        }
-	    
-	    
-	    
-	   
-	   
-
-	   
-	   
-	   
-	   
 
 	   return equipmentService.createEquipment(equipmentRequest);	
 	}
@@ -120,7 +96,36 @@ public class EquipmentController {
 	}
 	
 	@PostMapping("/equipment/onActive/{equipId}")
-	public void onActiveEquipment(@PathVariable("equipId") String equipId) {
+	public void onActiveEquipment(@PathVariable("equipId") String equipId,HttpServletRequest request,Principal principals) {
+	    System.out.println(principals);
+	    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    
+	    if(principal instanceof UserDetails) {
+	        String username = ((UserDetails)principal).getUsername();
+	        System.out.println("aa"+username);
+	    } else {
+	        String username = principal.toString();
+	        System.out.println("bb"+username);
+	    }
+	    
+	    
+	    
+    	  ObjectMapper mapper = new ObjectMapper();
+    	  String json = null;
+    	  try {
+            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request.getHeaderNames());
+            System.out.println(json);
+    	  } catch (JsonProcessingException e) {
+        }
+
+//	    System.out.println(request.getHeaderNames());
+	            
+//        Object principal = auth.getPrincipal();
+//        String name = "";
+//        if(principal != null || principal instanceof User) {
+//            name = ((User)principal).getUsername();
+//            System.out.println(name);
+//        }
 	 	equipmentService.onActiveEquipment(equipId);
 	}
 	

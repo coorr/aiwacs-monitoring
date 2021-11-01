@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -26,6 +27,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	private UserDetailsServiceImpl userDetailsService;
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+	
+	
 
 	@Override // 로그인 시에 암호화해서 발급했던 토큰인지 확인
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -40,7 +43,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+				
 				SecurityContextHolder.getContext().setAuthentication(authentication);  // 현재 세션의 사용자 정보를 넣어줌
 			}
 		} catch (Exception e) {

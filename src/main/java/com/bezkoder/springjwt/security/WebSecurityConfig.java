@@ -56,8 +56,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()   // 다른 http 통신이 올 경우 cors,csrf  정책을 off
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/**").permitAll()
+//			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+			.authorizeRequests()
+			.antMatchers("/api/auth/**").permitAll()
 			.antMatchers("/api/test/**").permitAll()
 			.antMatchers("/api/manage/**").permitAll()
 			.anyRequest().authenticated();
