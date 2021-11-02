@@ -8,28 +8,34 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Getter;
+
 @Entity
 @Table(	name = "users", 
 		uniqueConstraints = { 
 			@UniqueConstraint(columnNames = "username"),
 			@UniqueConstraint(columnNames = "email") 
 		})
+@Getter
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	public Long id;
 
 	@NotBlank
 	@Size(max = 20)
-	private String username;
+	public String username;
 
 	@NotBlank
 	@Size(max = 50)
 	@Email
-	private String email;
+	public String email;
 
 	@NotBlank
 	@Size(max = 120)
+	@JsonIgnore
 	private String password;
 
 	@ManyToMany(fetch = FetchType.LAZY)  // 부모 실행 , 자식은 객체로

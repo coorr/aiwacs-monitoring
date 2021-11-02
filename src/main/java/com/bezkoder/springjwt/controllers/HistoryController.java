@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bezkoder.springjwt.models.Equipment;
 import com.bezkoder.springjwt.models.HistoryRecord;
+import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.service.EquipmentService;
 import com.bezkoder.springjwt.service.GroupService;
 import com.bezkoder.springjwt.service.HistoryService;
@@ -26,6 +27,11 @@ public class HistoryController {
     @GetMapping("/getHistoryRecord")
     public List<HistoryRecord> getHistoryRecord() {
         return historyService.getHistoryRecord();
+    }
+    
+    @GetMapping("/getUserHistory")
+    public List<User> getUserHistory() {
+        return historyService.getUserHistory();
     }
     
 }

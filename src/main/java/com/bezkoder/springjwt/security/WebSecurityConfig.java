@@ -30,6 +30,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
+	
+//	@Autowired
+//	public void configureAuthentication(AuthenticationManagerBuilder builder) {
+//	    builder.authenticationProvider(null)
+//	}
 								
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -56,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()   // 다른 http 통신이 올 경우 cors,csrf  정책을 off
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-//			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests()
 			.antMatchers("/api/auth/**").permitAll()
 			.antMatchers("/api/test/**").permitAll()

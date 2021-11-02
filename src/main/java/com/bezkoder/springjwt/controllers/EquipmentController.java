@@ -99,7 +99,7 @@ public class EquipmentController {
 	public void onActiveEquipment(@PathVariable("equipId") String equipId,HttpServletRequest request,Principal principals) {
 	    System.out.println(principals);
 	    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	    
+	   
 	    if(principal instanceof UserDetails) {
 	        String username = ((UserDetails)principal).getUsername();
 	        System.out.println("aa"+username);

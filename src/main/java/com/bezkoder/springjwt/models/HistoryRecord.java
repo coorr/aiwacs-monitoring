@@ -23,7 +23,7 @@ public class HistoryRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "record_id")
-    private Integer id;
+    private Long id;
 
     private String actionType;  
     private Integer settingIp;  
