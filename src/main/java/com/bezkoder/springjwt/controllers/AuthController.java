@@ -1,10 +1,13 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.time.LocalDateTime;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.hibernate.internal.build.AllowSysOut;
@@ -20,14 +23,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.bezkoder.springjwt.common.Constants;
 import com.bezkoder.springjwt.models.ERole;
+import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.models.Role;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.LoginRequest;
 import com.bezkoder.springjwt.payload.request.SignupRequest;
 import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
+import com.bezkoder.springjwt.repository.HistoryRecordRepository;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
@@ -39,20 +47,19 @@ import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 // SecurityContextHolder ->" getContext() " 중간자 -> Authentication -> principal
 
 public class AuthController {
-	@Autowired
-	AuthenticationManager authenticationManager;
+	@Autowired AuthenticationManager authenticationManager;
 
-	@Autowired
-	UserRepository userRepository;
+	@Autowired UserRepository userRepository;
 
-	@Autowired
-	RoleRepository roleRepository;
+	@Autowired RoleRepository roleRepository;
 
-	@Autowired
-	PasswordEncoder encoder;
+	@Autowired PasswordEncoder encoder;
 
-	@Autowired
-	JwtUtils jwtUtils;
+	@Autowired JwtUtils jwtUtils;
+	
+	@Autowired HttpServletRequest request ;
+	
+	@Autowired HistoryRecordRepository historyRecordRepository;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -72,7 +79,20 @@ public class AuthController {
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 		
-		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        String ip = request.getRemoteAddr();
+        
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(username);
+        historyRecord.setActionType(Constants.STATUS_LOGIN_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_LOGIN);
+        historyRecord.setTargetName(loginRequest.getUsername());
+        historyRecord.setSettingIp(ip);
+        historyRecord.setPageURL(Constants.STATUS_URL_LOGIN);
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 

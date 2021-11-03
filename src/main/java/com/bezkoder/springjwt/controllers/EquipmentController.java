@@ -66,17 +66,11 @@ public class EquipmentController {
  
 	private final EquipmentService equipmentService;
 	
-	@Autowired
-    private UserDetailsServiceImpl userDetailsService;
 	
 
 	@PostMapping("/equipment")
 	public ResponseEntity<?> createEquipment(@RequestBody EquipmentRequest equipmentRequest,HttpServletRequest request) {
-	    ObjectMapper mapper = new ObjectMapper();
-	   
-
-
-	   return equipmentService.createEquipment(equipmentRequest);	
+	     return equipmentService.createEquipment(equipmentRequest);	
 	}
 	
 	@GetMapping("/getEquipment")
@@ -96,37 +90,8 @@ public class EquipmentController {
 	}
 	
 	@PostMapping("/equipment/onActive/{equipId}")
-	public void onActiveEquipment(@PathVariable("equipId") String equipId,HttpServletRequest request,Principal principals) {
-	    System.out.println(principals);
-	    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	   
-	    if(principal instanceof UserDetails) {
-	        String username = ((UserDetails)principal).getUsername();
-	        System.out.println("aa"+username);
-	    } else {
-	        String username = principal.toString();
-	        System.out.println("bb"+username);
-	    }
-	    
-	    
-	    
-    	  ObjectMapper mapper = new ObjectMapper();
-    	  String json = null;
-    	  try {
-            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request.getHeaderNames());
-            System.out.println(json);
-    	  } catch (JsonProcessingException e) {
-        }
-
-//	    System.out.println(request.getHeaderNames());
-	            
-//        Object principal = auth.getPrincipal();
-//        String name = "";
-//        if(principal != null || principal instanceof User) {
-//            name = ((User)principal).getUsername();
-//            System.out.println(name);
-//        }
-	 	equipmentService.onActiveEquipment(equipId);
+	public void onActiveEquipment(@PathVariable("equipId") String equipId,HttpServletRequest request) {
+equipmentService.onActiveEquipment(equipId);
 	}
 	
 	@PostMapping("/equipment/offActive/{equipId}")

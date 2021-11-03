@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,14 +28,15 @@ public class HistoryRecord {
     private Long id;
 
     private String actionType;  
-    private Integer settingIp;  
+    private String settingIp;  
     private String menuDepth1;  
     private String menuDepth2;  
     private String menuDepth3;  
-    private String menuDepth4s;  
+    private String menuDepth4;  
     private String pageURL;  
     private String targetName;  
-    private String userName;  
+    private String userName;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime workDate;
 
 

@@ -32,9 +32,18 @@ public interface GroupRepository  extends JpaRepository<Group, Integer> {
     @Query("delete from Group g where g.id in (:id)")
     Integer deleteGroup(@Param("id") int[] id);
     
+    @Query("select g.treeName from Group g where g.id in (:id)")
+    String findName(@Param("id") int[] id);
+    
     @Modifying(clearAutomatically=true)
     @Query("delete from GroupEquipmentJoin j where j.equipment_id in (:id)")
     Integer deleteEquipment(@Param("id") int[] id);
+    
+    @Query("select e.equipment from Equipment e where e.id in (:id)")
+    String findNameEquipment(@Param("id") int[] id);
+    
+    @Query("select e.equipment from Equipment e where e.id =:id")
+    String findNameEquipmentInteger(@Param("id") Integer id);
     
     @Modifying(clearAutomatically=true)
     @Query(value="insert into group_equipment_join(group_id, equipment_id) values (:parentKey, :deviceKeys)", nativeQuery = true)

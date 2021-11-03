@@ -17,14 +17,14 @@ import com.bezkoder.springjwt.models.User;
 @Repository
 public interface HistoryRecordRepository extends JpaRepository<HistoryRecord, Long> {
 
-    @Query("select h from HistoryRecord h ")
+    @Query("select h from HistoryRecord h order by h.id desc")
     List<HistoryRecord> getHistoryRecord();
     
     @Query("select u from User u")
     List<User> getUserHistory();
     
-    @Query("select r.name from Role r where r.id =:id")
-    List<Role> getRoleHistory(@Param("id")Long id);
+    @Query("select h from HistoryRecord h where h.userName in (:user) and h.actionType in (:action) order by h.id desc")
+    List<HistoryRecord> getSelectHistory(@Param("user")String[] user,@Param("action")String[] action);
     
 
 }

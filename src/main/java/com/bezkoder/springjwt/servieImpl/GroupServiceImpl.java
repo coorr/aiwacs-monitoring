@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,21 +16,27 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bezkoder.springjwt.common.Constants;
 import com.bezkoder.springjwt.models.Equipment;
 import com.bezkoder.springjwt.models.Group;
 import com.bezkoder.springjwt.models.GroupEquipmentJoin;
+import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.payload.response.GroupResponse;
 import com.bezkoder.springjwt.repository.EquipmentRepository;
 import com.bezkoder.springjwt.repository.GroupEquipmentJoinRepository;
 import com.bezkoder.springjwt.repository.GroupRepository;
+import com.bezkoder.springjwt.repository.HistoryRecordRepository;
 import com.bezkoder.springjwt.service.GroupService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,6 +54,8 @@ public class GroupServiceImpl implements GroupService {
     
     private final GroupRepository groupRepository;
     private final GroupEquipmentJoinRepository groupEquipmentJoinRepository;
+    private final HistoryRecordRepository historyRecordRepository;
+    private final HttpServletRequest request;
     
     
     @Override
@@ -158,11 +167,6 @@ public class GroupServiceImpl implements GroupService {
                }
             }  
         }
-
-        
-
-
-        
         return resultList;
     }
 
@@ -186,8 +190,40 @@ public class GroupServiceImpl implements GroupService {
         String[] arrayId = groupId.split(",");
         int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
         if(name.equals("parent")) {
+            for(Integer ids : id) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                HistoryRecord historyRecord = new HistoryRecord();
+                historyRecord.setUserName(auth.getName());
+                historyRecord.setActionType(Constants.STATUS_DELETE_STRING);
+                historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+                historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
+                historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT);
+                historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
+                historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
+                historyRecord.setSettingIp(request.getRemoteAddr());
+                historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+                LocalDateTime date = LocalDateTime.now();
+                historyRecord.setWorkDate(date);
+                historyRecordRepository.save(historyRecord);
+            }
             groupRepository.deleteGroup(id);
         } else if(name.equals("children")) {
+            for(Integer ids : id) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                HistoryRecord historyRecord = new HistoryRecord();
+                historyRecord.setUserName(auth.getName());
+                historyRecord.setActionType(Constants.STATUS_DELETE_STRING);
+                historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+                historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
+                historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT);
+                historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
+                historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
+                historyRecord.setSettingIp(request.getRemoteAddr());
+                historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+                LocalDateTime date = LocalDateTime.now();
+                historyRecord.setWorkDate(date);
+                historyRecordRepository.save(historyRecord);
+            }
             groupRepository.deleteEquipment(id);
         } 
         
@@ -198,6 +234,21 @@ public class GroupServiceImpl implements GroupService {
     public void insertGroupFirst(Group group) {
         group.setTreeName(group.getTreeName());
         groupRepository.save(group);
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(auth.getName());
+        historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
+        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT_GROUP);
+        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
+        historyRecord.setTargetName(group.getTreeName());
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
     }
 
     @Transactional
@@ -206,12 +257,44 @@ public class GroupServiceImpl implements GroupService {
         groupEquipmentJoin.setGroup_id(groupEquipmentJoin.getGroup_id());
         groupEquipmentJoin.setEquipment_id(groupEquipmentJoin.getEquipment_id());
         groupEquipmentJoinRepository.save(groupEquipmentJoin);
+        
+        System.out.println(groupRepository.findNameEquipmentInteger(groupEquipmentJoin.getEquipment_id()));
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(auth.getName());
+        historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
+        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT);
+        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
+        historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(groupEquipmentJoin.getEquipment_id()));
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
     }
 
     @Transactional
     @Override
     public void updateGroupName(Integer id,Group group) {
         groupRepository.updateGroupName(id,group.getTreeName());
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(auth.getName());
+        historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
+        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT_GROUP);
+        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
+        historyRecord.setTargetName(group.getTreeName());
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
     }
 
     @Override
@@ -223,6 +306,21 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public void insertGroupSecond(Group group) {
 		groupRepository.save(group);
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(auth.getName());
+        historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
+        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT_GROUP);
+        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
+        historyRecord.setTargetName(group.getTreeName());
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
 	}
     
     @Override

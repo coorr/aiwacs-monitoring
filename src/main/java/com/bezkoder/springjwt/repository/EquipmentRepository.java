@@ -18,6 +18,12 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
    
     @Query("select e from Equipment e where e.deletedFlag =true order by e.id desc")
     List<Equipment> findAlls();
+    
+    @Query("select e.equipment from Equipment e where e.id in (:id)")
+    String findName(@Param("id")int[] id);
+    
+    @Query("select e.equipment from Equipment e where e.id =:id")
+    String findNameInteger(@Param("id")Integer id);
    
     @Query("select e from Equipment e where e.id =:id")
     Equipment findOne(Integer id);

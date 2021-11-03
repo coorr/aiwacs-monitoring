@@ -4,15 +4,19 @@ package com.bezkoder.springjwt.servieImpl;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
+import org.apache.poi.ss.formula.functions.Now;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -27,6 +31,9 @@ import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,13 +54,15 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class EquipmentServiceImpl implements EquipmentService{
 
-	private final EquipmentRepository equipmentRepository;
-	private final HistoryRecordRepository historyRecordRepository;
+   private final EquipmentRepository equipmentRepository;
+   private final HistoryRecordRepository historyRecordRepository;
+   private final HttpServletRequest request;
+   
 
-	@Transactional
+    @Transactional
     @Override
     public ResponseEntity<?> createEquipment(EquipmentRequest equipmentRequest) {
-	    if (equipmentRepository.checkSettingIp(equipmentRequest.getSettingIp())) {
+       if (equipmentRepository.checkSettingIp(equipmentRequest.getSettingIp())) {
             System.out.println("settingIp");
             return ResponseEntity
                     .badRequest()  
@@ -78,143 +87,212 @@ public class EquipmentServiceImpl implements EquipmentService{
                 );
         equipmentRepository.save(equipment);
         
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         HistoryRecord historyRecord = new HistoryRecord();
-//        historyRecord.setUserName(historyRecord.getUserName());
+        historyRecord.setUserName(auth.getName());
         historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
-//        historyRecord.setMenuDepth1(historyRecord.getMenuDepth1());
-//        historyRecord.setSettingIp(historyRecord.getSettingIp());
-        historyRecord.setPageURL(Constants.STATUS_URL_GROUPDEVICEMANAGE);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
         historyRecord.setTargetName(equipmentRequest.getEquipment());
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
         LocalDateTime date = LocalDateTime.now();
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
         return null;
     }
-	
-	@Transactional 
-	@Override
-	public ResponseEntity<?> updateEquipmentByNo(Integer equipId,EquipmentRequest equipmentRequest) {
-	    String settingIp = equipmentRequest.getSettingIp();
-	    String beforeSettingIp = equipmentRepository.findSettingIpOne(equipId);
-	    if(settingIp.equals(beforeSettingIp)) {
-	        Equipment equipment = equipmentRepository.findOne(equipId);
-	        
-	        equipment.setId(equipId);
-	        equipment.setEquipment(equipmentRequest.getEquipment());
-	        equipment.setNickname(equipmentRequest.getNickname());
-	        equipment.setSettingType(equipmentRequest.getSettingType());
-	        equipment.setSettingTemplate(equipmentRequest.getSettingTemplate());
-	        equipment.setSettingIp(equipmentRequest.getSettingIp());
-	        equipment.setSettingCatagory(equipmentRequest.getSettingCatagory());
-	        equipment.setSettingOs(equipmentRequest.getSettingOs());
-	        equipment.setSettingPerson(equipmentRequest.getSettingPerson());
-	        equipment.setSettingProxy(equipmentRequest.getSettingProxy());
-	        equipment.setSettingActive(equipmentRequest.isSettingActive());
-	        equipment.setHwCpu(equipmentRequest.getHwCpu());
-	        equipment.setHwDisk(equipmentRequest.getHwDisk());
-	        equipment.setHwNic(equipmentRequest.getHwNic());
-	        equipment.setHwSensor(equipmentRequest.getHwSensor());
-	        
-	        return null;
-	    } else if (equipmentRepository.checkSettingIp(equipmentRequest.getSettingIp())) {
+   
+   @Transactional 
+   @Override
+   public ResponseEntity<?> updateEquipmentByNo(Integer equipId,EquipmentRequest equipmentRequest) {
+       String settingIp = equipmentRequest.getSettingIp();
+       String beforeSettingIp = equipmentRepository.findSettingIpOne(equipId);
+       if(settingIp.equals(beforeSettingIp)) {
+           Equipment equipment = equipmentRepository.findOne(equipId);
+           
+           equipment.setId(equipId);
+           equipment.setEquipment(equipmentRequest.getEquipment());
+           equipment.setNickname(equipmentRequest.getNickname());
+           equipment.setSettingType(equipmentRequest.getSettingType());
+           equipment.setSettingTemplate(equipmentRequest.getSettingTemplate());
+           equipment.setSettingIp(equipmentRequest.getSettingIp());
+           equipment.setSettingCatagory(equipmentRequest.getSettingCatagory());
+           equipment.setSettingOs(equipmentRequest.getSettingOs());
+           equipment.setSettingPerson(equipmentRequest.getSettingPerson());
+           equipment.setSettingProxy(equipmentRequest.getSettingProxy());
+           equipment.setSettingActive(equipmentRequest.isSettingActive());
+           equipment.setHwCpu(equipmentRequest.getHwCpu());
+           equipment.setHwDisk(equipmentRequest.getHwDisk());
+           equipment.setHwNic(equipmentRequest.getHwNic());
+           equipment.setHwSensor(equipmentRequest.getHwSensor());
+           
+           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+           HistoryRecord historyRecord = new HistoryRecord();
+           historyRecord.setUserName(auth.getName());
+           historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
+           historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+           historyRecord.setTargetName(equipmentRequest.getEquipment());
+           historyRecord.setSettingIp(request.getRemoteAddr());
+           historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+           LocalDateTime date = LocalDateTime.now();
+           historyRecord.setWorkDate(date);
+           historyRecordRepository.save(historyRecord);
+           
+           return null;
+       } else if (equipmentRepository.checkSettingIp(equipmentRequest.getSettingIp())) {
             System.out.println("settingIp");
             return ResponseEntity
                     .badRequest()  
                     .body(new MessageResponse("setting IP Check faild"));
         }
-	    
-		Equipment equipment = equipmentRepository.findOne(equipId);
-		
-		equipment.setId(equipId);
-		equipment.setEquipment(equipmentRequest.getEquipment());
-		equipment.setNickname(equipmentRequest.getNickname());
-		equipment.setSettingType(equipmentRequest.getSettingType());
-		equipment.setSettingTemplate(equipmentRequest.getSettingTemplate());
-		equipment.setSettingIp(equipmentRequest.getSettingIp());
-		equipment.setSettingCatagory(equipmentRequest.getSettingCatagory());
-		equipment.setSettingOs(equipmentRequest.getSettingOs());
-		equipment.setSettingPerson(equipmentRequest.getSettingPerson());
-		equipment.setSettingProxy(equipmentRequest.getSettingProxy());
-		equipment.setSettingActive(equipmentRequest.isSettingActive());
-		equipment.setHwCpu(equipmentRequest.getHwCpu());
-		equipment.setHwDisk(equipmentRequest.getHwDisk());
-		equipment.setHwNic(equipmentRequest.getHwNic());
-		equipment.setHwSensor(equipmentRequest.getHwSensor());
-		
-		return null;
-	}
+      return null;
+   }
 
-	@Override
-	public List<Equipment> getEquipments() {
-		return equipmentRepository.findAlls();
-	}
+   @Override
+   public List<Equipment> getEquipments() {
+      return equipmentRepository.findAlls();
+   }
 
-	@Transactional 
-	@Override
-	public void onActiveEquipment(String equipId) {
-		String[] arrayId = equipId.split("\\|");
-	 	int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
-	 	equipmentRepository.onActiveUpdate(id);
-	}
+   @Transactional 
+   @Override
+   public void onActiveEquipment(String equipId) {
+       String[] arrayId = equipId.split("\\|");
+       int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
+       equipmentRepository.onActiveUpdate(id);
+       
+       for(Integer ids : id) {
+           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+           HistoryRecord historyRecord = new HistoryRecord();
+           historyRecord.setUserName(auth.getName());
+           historyRecord.setActionType(Constants.STATUS_ACTIVE_STRING);
+           historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+           historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
+           historyRecord.setSettingIp(request.getRemoteAddr());
+           historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+           LocalDateTime date = LocalDateTime.now();
+           historyRecord.setWorkDate(date);
+           historyRecordRepository.save(historyRecord);
+       }
+       
+   }
 
-	@Transactional 
-	@Override
-	public void offActiveEquipment(String equipId) {
-		String[] arrayId = equipId.split("\\|");
-	 	int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
-	 	equipmentRepository.offActiveUpdate(id);
-		
-	}
+   @Transactional 
+   @Override
+   public void offActiveEquipment(String equipId) {
+      String[] arrayId = equipId.split("\\|");
+       int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
+       equipmentRepository.offActiveUpdate(id);
+       
+       for(Integer ids : id) {
+           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+           HistoryRecord historyRecord = new HistoryRecord();
+           historyRecord.setUserName(auth.getName());
+           historyRecord.setActionType(Constants.STATUS_INACTIVE_STRING);
+           historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+           historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
+           historyRecord.setSettingIp(request.getRemoteAddr());
+           historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+           LocalDateTime date = LocalDateTime.now();
+           historyRecord.setWorkDate(date);
+           historyRecordRepository.save(historyRecord);
+       }
+   }
 
-	@Transactional 
-	@Override
-	public void deleteEquipment(String equipId) {
-		String[] arrayId = equipId.split("\\|");
-		int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();	
-		equipmentRepository.deleteOne(id);
-		
-	}
+   @Transactional 
+   @Override
+   public void deleteEquipment(String equipId) {
+      String[] arrayId = equipId.split("\\|");
+      int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();   
+      equipmentRepository.deleteOne(id);
+      
+      for(Integer ids : id) {
+          Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+          HistoryRecord historyRecord = new HistoryRecord();
+          historyRecord.setUserName(auth.getName());
+          historyRecord.setActionType(Constants.STATUS_DELETE_STRING);
+          historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+          historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
+          historyRecord.setSettingIp(request.getRemoteAddr());
+          historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
+          LocalDateTime date = LocalDateTime.now();
+          historyRecord.setWorkDate(date);
+          historyRecordRepository.save(historyRecord);
+      }
+      
+   }
 
-	@Override
+    @Override
     public List<Equipment> searchFilterEquipment(String equipType, String equipCatagory) {
-		String[] equipTypes = equipType.split(",");
-		String[] equipCatagorys = equipCatagory.split(",");
-		return equipmentRepository.searchFilterEquipment(equipTypes, equipCatagorys);
-	   }
+      String[] equipTypes = equipType.split(",");
+      String[] equipCatagorys = equipCatagory.split(",");
+      return equipmentRepository.searchFilterEquipment(equipTypes, equipCatagorys);
+      }
 
-	@Transactional 
+    @Transactional 
     @Override
     public void allTooltipHwUpdateEquipment(Integer hwCpu,Integer hwDisk,Integer hwNic, Integer hwSensor,String hwid) {
-	    String[] hwids= hwid.split(",");
-	    int[] id=Arrays.stream(hwids).mapToInt(Integer::parseInt).toArray();
-	    equipmentRepository.tooltipHwUpdate(hwCpu, hwDisk,hwNic,hwSensor, id);
+       String[] hwids= hwid.split(",");
+       int[] id=Arrays.stream(hwids).mapToInt(Integer::parseInt).toArray();
+       equipmentRepository.tooltipHwUpdate(hwCpu, hwDisk,hwNic,hwSensor, id);
+       
+       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+       HistoryRecord historyRecord = new HistoryRecord();
+       historyRecord.setUserName(auth.getName());
+       historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
+       historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+       historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_HARDWARECYCLE);
+       historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_ALLAPPLY);
+       historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_SYSTEMCYCLE);
+       historyRecord.setTargetName(equipmentRepository.findName(id));
+       historyRecord.setSettingIp(request.getRemoteAddr());
+       historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+       LocalDateTime date = LocalDateTime.now();
+       historyRecord.setWorkDate(date);
+       historyRecordRepository.save(historyRecord);
     }
-	
+   
     @Transactional 
     @Override
     public void eachTooltipHwUpdateEquipment(Integer hwCpu, Integer hwDisk, Integer hwNic, Integer hwSensor,String hwid) {
        String[] hwids= hwid.split(",");
        int[] id=Arrays.stream(hwids).mapToInt(Integer::parseInt).toArray();
-      if(hwCpu != null) {
-          equipmentRepository.cpuHwUpdate(hwCpu, id);
-       } else if (hwDisk != null ) {
-          equipmentRepository.diskHwUpdate(hwDisk, id);
-       } else if (hwNic != null ) {
-          equipmentRepository.nicHwUpdate(hwNic, id);
-       } else if (hwSensor != null ) {
-          equipmentRepository.sensorHwUpdate(hwSensor, id);
-       }
+     
+       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
       
+       HistoryRecord historyRecord = new HistoryRecord();
+       historyRecord.setUserName(auth.getName());
+       historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
+       historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+       historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_HARDWARECYCLE);
+       historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EACHAPPLY);
+       if(hwCpu != null) {
+           equipmentRepository.cpuHwUpdate(hwCpu, id);
+           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_CPU);
+        } else if (hwDisk != null ) {
+           equipmentRepository.diskHwUpdate(hwDisk, id);
+           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_DISK);
+        } else if (hwNic != null ) {
+           equipmentRepository.nicHwUpdate(hwNic, id);
+           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_NICK);
+        } else if (hwSensor != null ) {
+           equipmentRepository.sensorHwUpdate(hwSensor, id);
+           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_SENSOR);
+        }
+       historyRecord.setTargetName(equipmentRepository.findName(id));
+       historyRecord.setSettingIp(request.getRemoteAddr());
+       historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+       LocalDateTime date = LocalDateTime.now();
+       historyRecord.setWorkDate(date);
+       historyRecordRepository.save(historyRecord);
    }
     
-   @Override
+    @Override
     public List<Equipment> getTooltipByNo(Integer hwid) {
         return equipmentRepository.getTooltipByNo(hwid);
     }
 
+    @Transactional
     @Override
     public ByteArrayInputStream  downloadExcel() {
-
         String version = "xls";
         int rowIndex = 1;
         
@@ -313,6 +391,19 @@ public class EquipmentServiceImpl implements EquipmentService{
       } catch (Exception e) {
           e.printStackTrace();
       }
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(auth.getName());
+        historyRecord.setActionType(Constants.STATUS_DOWNLOAD_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_DOWNLOAD);
+        historyRecord.setTargetName("Devices.xls");
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
         return new ByteArrayInputStream(out.toByteArray()); 
     }
     
@@ -367,21 +458,30 @@ public class EquipmentServiceImpl implements EquipmentService{
                equipmentRepository.save(equipment);
            }    
        } 
-       return  !notIpdeviceList.isEmpty() ?  ResponseEntity.ok(notIpdeviceList) : null; 
-           
-        
+       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
        
+       HistoryRecord historyRecord = new HistoryRecord();
+       historyRecord.setUserName(auth.getName());
+       historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
+       historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
+       historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_UPLOADCREATE);
+       historyRecord.setTargetName("Equipment.xls");
+       historyRecord.setSettingIp(request.getRemoteAddr());
+       historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
+       LocalDateTime date = LocalDateTime.now();
+       historyRecord.setWorkDate(date);
+       historyRecordRepository.save(historyRecord);
+       return  !notIpdeviceList.isEmpty() ?  ResponseEntity.ok(notIpdeviceList) : null; 
     }
 
    
   
 
-	
-	
-	
+   
+   
+   
 
 }
-
 
 
 
