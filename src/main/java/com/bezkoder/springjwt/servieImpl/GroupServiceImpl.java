@@ -202,7 +202,7 @@ public class GroupServiceImpl implements GroupService {
                 historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
                 historyRecord.setSettingIp(request.getRemoteAddr());
                 historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-                LocalDateTime date = LocalDateTime.now();
+                LocalDateTime date = LocalDateTime.now().withNano(0);
                 historyRecord.setWorkDate(date);
                 historyRecordRepository.save(historyRecord);
             }
@@ -220,7 +220,7 @@ public class GroupServiceImpl implements GroupService {
                 historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
                 historyRecord.setSettingIp(request.getRemoteAddr());
                 historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-                LocalDateTime date = LocalDateTime.now();
+                LocalDateTime date = LocalDateTime.now().withNano(0);
                 historyRecord.setWorkDate(date);
                 historyRecordRepository.save(historyRecord);
             }
@@ -246,7 +246,7 @@ public class GroupServiceImpl implements GroupService {
         historyRecord.setTargetName(group.getTreeName());
         historyRecord.setSettingIp(request.getRemoteAddr());
         historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
     }
@@ -271,7 +271,7 @@ public class GroupServiceImpl implements GroupService {
         historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(groupEquipmentJoin.getEquipment_id()));
         historyRecord.setSettingIp(request.getRemoteAddr());
         historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
     }
@@ -292,7 +292,7 @@ public class GroupServiceImpl implements GroupService {
         historyRecord.setTargetName(group.getTreeName());
         historyRecord.setSettingIp(request.getRemoteAddr());
         historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
     }
@@ -318,7 +318,7 @@ public class GroupServiceImpl implements GroupService {
         historyRecord.setTargetName(group.getTreeName());
         historyRecord.setSettingIp(request.getRemoteAddr());
         historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
 	}

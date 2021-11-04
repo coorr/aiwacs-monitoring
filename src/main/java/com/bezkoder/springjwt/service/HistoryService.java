@@ -10,6 +10,6 @@ public interface HistoryService {
 
     public List<HistoryRecord> getHistoryRecord();
     public List<User> getUserHistory();
-    public List<HistoryRecord> getSelectHistory(String[] user,String[] action);
-    public ByteArrayInputStream  downloadExcel();
+    public List<HistoryRecord> getSelectHistory(String[] user,String[] action,String firstDate,String secondDate);
+    public ByteArrayInputStream  historyDownloadExcel(String user,String firstDate,String outDate);
 }

@@ -19,8 +19,8 @@ public interface GroupRepository  extends JpaRepository<Group, Integer> {
     @Query("select g from Group g order by g.id asc")
     List<Group> getGroup();
     
-    @Query("select e,j from Equipment e, GroupEquipmentJoin j where e.id = j.equipment_id and j.group_id =:id ")
-    List<Equipment> getEquipment(@Param("id") Integer id);
+    @Query("select e,j from Equipment e, GroupEquipmentJoin j where e.id = j.equipment_id and j.group_id = ?1 ")
+    List<Equipment> getEquipment(Integer id);
     
     @Query("select j from GroupEquipmentJoin j where j.group_id =:id ")
     List<GroupEquipmentJoin> getGroupEquipmentJoin(@Param("id") Integer id);

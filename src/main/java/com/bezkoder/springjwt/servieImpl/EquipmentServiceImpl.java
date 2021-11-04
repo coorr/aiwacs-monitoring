@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.springjwt.common.Constants;
+import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.Equipment;
 import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.payload.request.EquipmentRequest;
@@ -87,6 +88,8 @@ public class EquipmentServiceImpl implements EquipmentService{
                 );
         equipmentRepository.save(equipment);
         
+        HistoryUtils.insertHistory();
+        
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         HistoryRecord historyRecord = new HistoryRecord();
         historyRecord.setUserName(auth.getName());
@@ -95,7 +98,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         historyRecord.setTargetName(equipmentRequest.getEquipment());
         historyRecord.setSettingIp(request.getRemoteAddr());
         historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
         return null;
@@ -133,7 +136,7 @@ public class EquipmentServiceImpl implements EquipmentService{
            historyRecord.setTargetName(equipmentRequest.getEquipment());
            historyRecord.setSettingIp(request.getRemoteAddr());
            historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-           LocalDateTime date = LocalDateTime.now();
+           LocalDateTime date = LocalDateTime.now().withNano(0);
            historyRecord.setWorkDate(date);
            historyRecordRepository.save(historyRecord);
            
@@ -161,6 +164,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        
        for(Integer ids : id) {
            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+           System.out.println(request.getServletPath());
            HistoryRecord historyRecord = new HistoryRecord();
            historyRecord.setUserName(auth.getName());
            historyRecord.setActionType(Constants.STATUS_ACTIVE_STRING);
@@ -168,11 +172,10 @@ public class EquipmentServiceImpl implements EquipmentService{
            historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
            historyRecord.setSettingIp(request.getRemoteAddr());
            historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-           LocalDateTime date = LocalDateTime.now();
+           LocalDateTime date = LocalDateTime.now().withNano(0);
            historyRecord.setWorkDate(date);
            historyRecordRepository.save(historyRecord);
        }
-       
    }
 
    @Transactional 
@@ -191,7 +194,7 @@ public class EquipmentServiceImpl implements EquipmentService{
            historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
            historyRecord.setSettingIp(request.getRemoteAddr());
            historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-           LocalDateTime date = LocalDateTime.now();
+           LocalDateTime date = LocalDateTime.now().withNano(0);
            historyRecord.setWorkDate(date);
            historyRecordRepository.save(historyRecord);
        }
@@ -213,7 +216,7 @@ public class EquipmentServiceImpl implements EquipmentService{
           historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
           historyRecord.setSettingIp(request.getRemoteAddr());
           historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-          LocalDateTime date = LocalDateTime.now();
+          LocalDateTime date = LocalDateTime.now().withNano(0);
           historyRecord.setWorkDate(date);
           historyRecordRepository.save(historyRecord);
       }
@@ -245,7 +248,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        historyRecord.setTargetName(equipmentRepository.findName(id));
        historyRecord.setSettingIp(request.getRemoteAddr());
        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-       LocalDateTime date = LocalDateTime.now();
+       LocalDateTime date = LocalDateTime.now().withNano(0);
        historyRecord.setWorkDate(date);
        historyRecordRepository.save(historyRecord);
     }
@@ -280,7 +283,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        historyRecord.setTargetName(equipmentRepository.findName(id));
        historyRecord.setSettingIp(request.getRemoteAddr());
        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-       LocalDateTime date = LocalDateTime.now();
+       LocalDateTime date = LocalDateTime.now().withNano(0);
        historyRecord.setWorkDate(date);
        historyRecordRepository.save(historyRecord);
    }
@@ -401,7 +404,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         historyRecord.setTargetName("Devices.xls");
         historyRecord.setSettingIp(request.getRemoteAddr());
         historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
         return new ByteArrayInputStream(out.toByteArray()); 
@@ -468,7 +471,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        historyRecord.setTargetName("Equipment.xls");
        historyRecord.setSettingIp(request.getRemoteAddr());
        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-       LocalDateTime date = LocalDateTime.now();
+       LocalDateTime date = LocalDateTime.now().withNano(0);
        historyRecord.setWorkDate(date);
        historyRecordRepository.save(historyRecord);
        return  !notIpdeviceList.isEmpty() ?  ResponseEntity.ok(notIpdeviceList) : null; 

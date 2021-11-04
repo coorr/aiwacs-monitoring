@@ -1,7 +1,10 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,9 +41,31 @@ public class HistoryController {
         return historyService.getUserHistory();
     }
     
-    @GetMapping("/getSelectHistory/{user}/{action}")
-    public List<HistoryRecord> getSelectHistory(@PathVariable("user")String[] user,@PathVariable("action")String[] action) {
-        return historyService.getSelectHistory(user,action);
+    @GetMapping("/getSelectHistory/{user}/{action}/{firstDate}/{secondDate}")
+    public List<HistoryRecord> getSelectHistory(@PathVariable("user")String[] user,@PathVariable("action")String[] action,
+                                     @PathVariable("firstDate")String firstDate, @PathVariable("secondDate")String secondDate) {
+       return historyService.getSelectHistory(user,action,firstDate,secondDate);  
     }
     
+    @GetMapping("/history/historyDownloadExcel/{user}/{firstDate}/{outDate}")
+    public ResponseEntity<InputStreamResource> downloadExcel(@PathVariable("user")String user,@PathVariable("firstDate")String firstDate,@PathVariable("outDate")String outDate) {
+        ByteArrayInputStream  responseFile = historyService.historyDownloadExcel(user,firstDate,outDate);
+         return ResponseEntity
+                 .ok()
+                 .header("Content-Disposition", "attachment; filename=filename.xls")
+                 .body(new InputStreamResource(responseFile));
+    }
+
+    
 }
+
+
+
+
+
+
+
+
+
+
+

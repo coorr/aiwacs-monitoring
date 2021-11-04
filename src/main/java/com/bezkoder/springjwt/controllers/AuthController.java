@@ -43,7 +43,7 @@ import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/aiwacs")
 // SecurityContextHolder ->" getContext() " 중간자 -> Authentication -> principal
 
 public class AuthController {
@@ -57,40 +57,37 @@ public class AuthController {
 
 	@Autowired JwtUtils jwtUtils;
 	
-	@Autowired HttpServletRequest request ;
+	@Autowired HttpServletRequest request;
 	
 	@Autowired HistoryRecordRepository historyRecordRepository;
 
 	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,HttpServletRequest req) {
         System.out.println(SecurityContextHolder.getContext().getAuthentication());
 	    
 	    System.out.println(loginRequest.getUsername());
 	    System.out.println(loginRequest.getPassword());
 		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())); // 암호확인
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())); 
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);  // 시큐리티 션저장소인 SecurityContextHolder에 저장
+		SecurityContextHolder.getContext().setAuthentication(authentication);  // 시큐리티 저장소인 SecurityContextHolder에 저장
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();   
-		System.out.println(authentication);
+		
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        String ip = request.getRemoteAddr();
-        
         HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(username);
+        historyRecord.setUserName(auth.getName());
         historyRecord.setActionType(Constants.STATUS_LOGIN_STRING);
         historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_LOGIN);
         historyRecord.setTargetName(loginRequest.getUsername());
-        historyRecord.setSettingIp(ip);
-        historyRecord.setPageURL(Constants.STATUS_URL_LOGIN);
-        LocalDateTime date = LocalDateTime.now();
+        historyRecord.setSettingIp(request.getRemoteAddr());
+        historyRecord.setPageURL(request.getServletPath());
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
 

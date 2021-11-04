@@ -19,7 +19,9 @@ public class Constants {
     public final static String STATUS_URL_MANAGE_EQUIPMENT_LIST = "/manageEquipmentList";
     public final static String STATUS_URL_EQUIPMENT_MANAGE = "/equipmentManage";
     public final static String STATUS_URL_LOGIN = "/login";
+    public final static String STATUS_URL_HISTORY_RECORD = "/historyRecord";
     
+    public final static String STATUS_DEPTH_HISTORY_RECORD ="감사 이력";
     public final static String STATUS_DEPTH_EQUIPMENT_MANAGE ="장비 관리";
     public final static String STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE ="장비 그룹 관리";
     public final static String STATUS_DEPTH_EQUIPMENT ="장비";
