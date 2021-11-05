@@ -88,19 +88,9 @@ public class EquipmentServiceImpl implements EquipmentService{
                 );
         equipmentRepository.save(equipment);
         
-        HistoryUtils.insertHistory();
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-        historyRecord.setTargetName(equipmentRequest.getEquipment());
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+        String targetName = equipmentRequest.getEquipment();
+        HistoryUtils.insertHistory(targetName);
+     
         return null;
     }
    
@@ -128,17 +118,8 @@ public class EquipmentServiceImpl implements EquipmentService{
            equipment.setHwNic(equipmentRequest.getHwNic());
            equipment.setHwSensor(equipmentRequest.getHwSensor());
            
-           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-           HistoryRecord historyRecord = new HistoryRecord();
-           historyRecord.setUserName(auth.getName());
-           historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
-           historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-           historyRecord.setTargetName(equipmentRequest.getEquipment());
-           historyRecord.setSettingIp(request.getRemoteAddr());
-           historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-           LocalDateTime date = LocalDateTime.now().withNano(0);
-           historyRecord.setWorkDate(date);
-           historyRecordRepository.save(historyRecord);
+           String targetName = equipmentRequest.getEquipment();
+           HistoryUtils.updateHistory(targetName);
            
            return null;
        } else if (equipmentRepository.checkSettingIp(equipmentRequest.getSettingIp())) {
@@ -161,21 +142,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        String[] arrayId = equipId.split("\\|");
        int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
        equipmentRepository.onActiveUpdate(id);
-       
-       for(Integer ids : id) {
-           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-           System.out.println(request.getServletPath());
-           HistoryRecord historyRecord = new HistoryRecord();
-           historyRecord.setUserName(auth.getName());
-           historyRecord.setActionType(Constants.STATUS_ACTIVE_STRING);
-           historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-           historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
-           historyRecord.setSettingIp(request.getRemoteAddr());
-           historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-           LocalDateTime date = LocalDateTime.now().withNano(0);
-           historyRecord.setWorkDate(date);
-           historyRecordRepository.save(historyRecord);
-       }
+       HistoryUtils.onActiveHistory(id);
    }
 
    @Transactional 
@@ -184,20 +151,7 @@ public class EquipmentServiceImpl implements EquipmentService{
       String[] arrayId = equipId.split("\\|");
        int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
        equipmentRepository.offActiveUpdate(id);
-       
-       for(Integer ids : id) {
-           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-           HistoryRecord historyRecord = new HistoryRecord();
-           historyRecord.setUserName(auth.getName());
-           historyRecord.setActionType(Constants.STATUS_INACTIVE_STRING);
-           historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-           historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
-           historyRecord.setSettingIp(request.getRemoteAddr());
-           historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-           LocalDateTime date = LocalDateTime.now().withNano(0);
-           historyRecord.setWorkDate(date);
-           historyRecordRepository.save(historyRecord);
-       }
+       HistoryUtils.offActiveHistory(id);
    }
 
    @Transactional 
@@ -206,21 +160,7 @@ public class EquipmentServiceImpl implements EquipmentService{
       String[] arrayId = equipId.split("\\|");
       int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();   
       equipmentRepository.deleteOne(id);
-      
-      for(Integer ids : id) {
-          Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-          HistoryRecord historyRecord = new HistoryRecord();
-          historyRecord.setUserName(auth.getName());
-          historyRecord.setActionType(Constants.STATUS_DELETE_STRING);
-          historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-          historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
-          historyRecord.setSettingIp(request.getRemoteAddr());
-          historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-          LocalDateTime date = LocalDateTime.now().withNano(0);
-          historyRecord.setWorkDate(date);
-          historyRecordRepository.save(historyRecord);
-      }
-      
+      HistoryUtils.deleteHistory(id);
    }
 
     @Override
@@ -236,21 +176,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        String[] hwids= hwid.split(",");
        int[] id=Arrays.stream(hwids).mapToInt(Integer::parseInt).toArray();
        equipmentRepository.tooltipHwUpdate(hwCpu, hwDisk,hwNic,hwSensor, id);
-       
-       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-       HistoryRecord historyRecord = new HistoryRecord();
-       historyRecord.setUserName(auth.getName());
-       historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
-       historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-       historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_HARDWARECYCLE);
-       historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_ALLAPPLY);
-       historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_SYSTEMCYCLE);
-       historyRecord.setTargetName(equipmentRepository.findName(id));
-       historyRecord.setSettingIp(request.getRemoteAddr());
-       historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-       LocalDateTime date = LocalDateTime.now().withNano(0);
-       historyRecord.setWorkDate(date);
-       historyRecordRepository.save(historyRecord);
+       HistoryUtils.allTooltipHistory(id);
     }
    
     @Transactional 
@@ -258,34 +184,17 @@ public class EquipmentServiceImpl implements EquipmentService{
     public void eachTooltipHwUpdateEquipment(Integer hwCpu, Integer hwDisk, Integer hwNic, Integer hwSensor,String hwid) {
        String[] hwids= hwid.split(",");
        int[] id=Arrays.stream(hwids).mapToInt(Integer::parseInt).toArray();
-     
-       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-      
-       HistoryRecord historyRecord = new HistoryRecord();
-       historyRecord.setUserName(auth.getName());
-       historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
-       historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-       historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_HARDWARECYCLE);
-       historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EACHAPPLY);
+       
        if(hwCpu != null) {
            equipmentRepository.cpuHwUpdate(hwCpu, id);
-           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_CPU);
         } else if (hwDisk != null ) {
            equipmentRepository.diskHwUpdate(hwDisk, id);
-           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_DISK);
         } else if (hwNic != null ) {
            equipmentRepository.nicHwUpdate(hwNic, id);
-           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_NICK);
         } else if (hwSensor != null ) {
            equipmentRepository.sensorHwUpdate(hwSensor, id);
-           historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_SENSOR);
         }
-       historyRecord.setTargetName(equipmentRepository.findName(id));
-       historyRecord.setSettingIp(request.getRemoteAddr());
-       historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-       LocalDateTime date = LocalDateTime.now().withNano(0);
-       historyRecord.setWorkDate(date);
-       historyRecordRepository.save(historyRecord);
+       HistoryUtils.eachTooltipHistory(id,hwCpu,hwDisk,hwNic,hwSensor);
    }
     
     @Override
@@ -395,18 +304,7 @@ public class EquipmentServiceImpl implements EquipmentService{
           e.printStackTrace();
       }
         
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_DOWNLOAD_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_DOWNLOAD);
-        historyRecord.setTargetName("Devices.xls");
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+        HistoryUtils.excelHistory();
         return new ByteArrayInputStream(out.toByteArray()); 
     }
     
@@ -461,19 +359,7 @@ public class EquipmentServiceImpl implements EquipmentService{
                equipmentRepository.save(equipment);
            }    
        } 
-       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-       
-       HistoryRecord historyRecord = new HistoryRecord();
-       historyRecord.setUserName(auth.getName());
-       historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
-       historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-       historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_UPLOADCREATE);
-       historyRecord.setTargetName("Equipment.xls");
-       historyRecord.setSettingIp(request.getRemoteAddr());
-       historyRecord.setPageURL(Constants.STATUS_URL_EQUIPMENT_MANAGE);
-       LocalDateTime date = LocalDateTime.now().withNano(0);
-       historyRecord.setWorkDate(date);
-       historyRecordRepository.save(historyRecord);
+       HistoryUtils.uploadEquipment();
        return  !notIpdeviceList.isEmpty() ?  ResponseEntity.ok(notIpdeviceList) : null; 
     }
 

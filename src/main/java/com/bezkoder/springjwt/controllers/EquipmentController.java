@@ -63,11 +63,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EquipmentController {
 	
- 
 	private final EquipmentService equipmentService;
 	
-	
-
 	@PostMapping("/equipment")
 	public ResponseEntity<?> createEquipment(@RequestBody EquipmentRequest equipmentRequest,HttpServletRequest request) {
 	     return equipmentService.createEquipment(equipmentRequest);	
@@ -91,7 +88,7 @@ public class EquipmentController {
 	
 	@PostMapping("/equipment/onActive/{equipId}")
 	public void onActiveEquipment(@PathVariable("equipId") String equipId,HttpServletRequest request) {
-equipmentService.onActiveEquipment(equipId);
+	     equipmentService.onActiveEquipment(equipId);
 	}
 	
 	@PostMapping("/equipment/offActive/{equipId}")

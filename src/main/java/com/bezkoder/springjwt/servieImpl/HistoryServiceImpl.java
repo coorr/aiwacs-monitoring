@@ -54,8 +54,8 @@ public class HistoryServiceImpl  implements HistoryService{
     }
 
     @Override
-    public List<User> getUserHistory() {
-        return historyRecordRepository.getUserHistory();
+    public List<User> getHistoryUser() {
+        return historyRecordRepository.getHistoryUser();
     }
 
     @Override
@@ -72,6 +72,7 @@ public class HistoryServiceImpl  implements HistoryService{
     public ByteArrayInputStream  historyDownloadExcel(String user,String firstDate,String outDate) {
         String version = "xls";
         int rowIndex = 8;
+        int id = 1;
         
         Workbook workbook = createWorkbook(version);
         Sheet sheet = workbook.createSheet("감사이력리스트");
@@ -143,7 +144,7 @@ public class HistoryServiceImpl  implements HistoryService{
             LocalDateTime date = dto.getWorkDate();
             String formatDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-            Cell bodyCell0 = bodyRow.createCell(0); bodyCell0.setCellValue(dto.getId());  bodyCell0.setCellStyle(bodyStyleCenter);
+            Cell bodyCell0 = bodyRow.createCell(0); bodyCell0.setCellValue(id++);  bodyCell0.setCellStyle(bodyStyleCenter);
             Cell bodyCell1 = bodyRow.createCell(1);  bodyCell1.setCellValue(dto.getUserName());    bodyCell1.setCellStyle(bodyStyle);
             Cell bodyCell2 = bodyRow.createCell(2); bodyCell2.setCellValue(dto.getActionType()); bodyCell2.setCellStyle(bodyStyle);
             Cell bodyCell3 = bodyRow.createCell(3); bodyCell3.setCellValue(dto.getMenuDepth1()); bodyCell3.setCellStyle(bodyStyle);
@@ -192,6 +193,11 @@ public class HistoryServiceImpl  implements HistoryService{
             return new HSSFWorkbook();
         }
         throw new NoClassDefFoundError();
+    }
+
+    @Override
+    public List<HistoryRecord> getTest(String[] user, String[] action) {
+        return historyRecordRepository.getTest(user, action);
     }
 }
 

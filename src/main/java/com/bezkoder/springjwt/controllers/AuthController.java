@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.bezkoder.springjwt.common.Constants;
+import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.ERole;
 import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.models.Role;
@@ -60,9 +62,11 @@ public class AuthController {
 	@Autowired HttpServletRequest request;
 	
 	@Autowired HistoryRecordRepository historyRecordRepository;
+	
+//	@Autowired HistoryUtils historyUtils;
 
 	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,HttpServletRequest req) {
+	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws UnknownHostException {
         System.out.println(SecurityContextHolder.getContext().getAuthentication());
 	    
 	    System.out.println(loginRequest.getUsername());
@@ -79,17 +83,9 @@ public class AuthController {
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_LOGIN_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_LOGIN);
-        historyRecord.setTargetName(loginRequest.getUsername());
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(request.getServletPath());
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+		String name = loginRequest.getUsername();
+		HistoryUtils.login(name);
+
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 

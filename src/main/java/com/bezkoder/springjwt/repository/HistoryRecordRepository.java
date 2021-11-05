@@ -25,13 +25,14 @@ public interface HistoryRecordRepository extends JpaRepository<HistoryRecord, Lo
     List<HistoryRecord> getHistoryRecordExcel();
     
     @Query("select u from User u")
-    List<User> getUserHistory();
+    List<User> getHistoryUser();
     
     @Query("select h from HistoryRecord h where h.userName in (?1) "
             + "and h.actionType in (?2) and h.workDate between ?3 and ?4 "
             + "order by h.id desc")
       List<HistoryRecord> getSelectHistory(String[] user, String[] action, LocalDateTime firstDates, LocalDateTime secondDates);
 
-    
+    @Query("select h from HistoryRecord h where h.userName in (?1) and h.actionType in (?2)")
+      List<HistoryRecord> getTest(String[] user, String[] action);
 
 }
