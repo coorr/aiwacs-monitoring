@@ -2,10 +2,15 @@ package com.bezkoder.springjwt.controllers;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class HistoryController {
 
     private final HistoryService historyService;
+    private final HttpServletRequest request;
     
     @GetMapping("/getHistoryRecord")
     public List<HistoryRecord> getHistoryRecord() {
@@ -43,10 +49,11 @@ public class HistoryController {
         return historyService.getHistoryUser();
     }
     
-    @GetMapping("/getSelectHistory/{user}/{action}/{firstDate}/{secondDate}")
-    public List<HistoryRecord> getSelectHistory(@PathVariable("user")String[] user,@PathVariable("action")String[] action,
-                                     @PathVariable("firstDate")String firstDate, @PathVariable("secondDate")String secondDate) {
-        return historyService.getSelectHistory(user,action,firstDate,secondDate);  
+    @GetMapping("/getSelectHistory")
+    public List<HistoryRecord> getSelectHistory(@RequestParam(required = false) int size,     @RequestParam(required = false) String user, 
+                                                @RequestParam(required = false) String action,@RequestParam(required = false) String firstDate,
+                                                @RequestParam(required = false) String secondDate) {
+        return historyService.getSelectHistory(size,user,action,firstDate,secondDate);  
     }
     
     @GetMapping("/history/historyDownloadExcel/{user}/{firstDate}/{outDate}")
@@ -57,12 +64,7 @@ public class HistoryController {
                  .header("Content-Disposition", "attachment; filename=filename.xls")
                  .body(new InputStreamResource(responseFile));
     }
-//    @GetMapping("/getSelectHistorys")
-//    public List<HistoryRecord> getTest(@RequestParam(required = false,defaultValue = "null") String[] user, @RequestParam(required = false,defaultValue = "null")String[] action) {
-//        System.out.println(Arrays.toString(user));
-//        System.out.println(Arrays.toString(action));
-//         return historyService.getTest(user,action); 
-//    }
+   
     
     
 

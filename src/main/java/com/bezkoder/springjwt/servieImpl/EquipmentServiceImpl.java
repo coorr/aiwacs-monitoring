@@ -56,8 +56,6 @@ import lombok.RequiredArgsConstructor;
 public class EquipmentServiceImpl implements EquipmentService{
 
    private final EquipmentRepository equipmentRepository;
-   private final HistoryRecordRepository historyRecordRepository;
-   private final HttpServletRequest request;
    
 
     @Transactional
@@ -89,7 +87,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         equipmentRepository.save(equipment);
         
         String targetName = equipmentRequest.getEquipment();
-        HistoryUtils.insertHistory(targetName);
+        HistoryUtils.equipmentCreateHistory(targetName);
      
         return null;
     }
@@ -119,7 +117,7 @@ public class EquipmentServiceImpl implements EquipmentService{
            equipment.setHwSensor(equipmentRequest.getHwSensor());
            
            String targetName = equipmentRequest.getEquipment();
-           HistoryUtils.updateHistory(targetName);
+           HistoryUtils.equipmentUpdateHistory(targetName);
            
            return null;
        } else if (equipmentRepository.checkSettingIp(equipmentRequest.getSettingIp())) {
@@ -142,7 +140,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        String[] arrayId = equipId.split("\\|");
        int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
        equipmentRepository.onActiveUpdate(id);
-       HistoryUtils.onActiveHistory(id);
+       HistoryUtils.equipmentOnActiveHistory(id);
    }
 
    @Transactional 
@@ -151,7 +149,7 @@ public class EquipmentServiceImpl implements EquipmentService{
       String[] arrayId = equipId.split("\\|");
        int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
        equipmentRepository.offActiveUpdate(id);
-       HistoryUtils.offActiveHistory(id);
+       HistoryUtils.equipmentOffActiveHistory(id);
    }
 
    @Transactional 
@@ -160,7 +158,7 @@ public class EquipmentServiceImpl implements EquipmentService{
       String[] arrayId = equipId.split("\\|");
       int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();   
       equipmentRepository.deleteOne(id);
-      HistoryUtils.deleteHistory(id);
+      HistoryUtils.equipmentDeleteHistory(id);
    }
 
     @Override
@@ -176,7 +174,7 @@ public class EquipmentServiceImpl implements EquipmentService{
        String[] hwids= hwid.split(",");
        int[] id=Arrays.stream(hwids).mapToInt(Integer::parseInt).toArray();
        equipmentRepository.tooltipHwUpdate(hwCpu, hwDisk,hwNic,hwSensor, id);
-       HistoryUtils.allTooltipHistory(id);
+       HistoryUtils.equipmentAllTooltipHistory(id);
     }
    
     @Transactional 
@@ -194,7 +192,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         } else if (hwSensor != null ) {
            equipmentRepository.sensorHwUpdate(hwSensor, id);
         }
-       HistoryUtils.eachTooltipHistory(id,hwCpu,hwDisk,hwNic,hwSensor);
+       HistoryUtils.equipmentEachTooltipHistory(id,hwCpu,hwDisk,hwNic,hwSensor);
    }
     
     @Override
@@ -304,7 +302,7 @@ public class EquipmentServiceImpl implements EquipmentService{
           e.printStackTrace();
       }
         
-        HistoryUtils.excelHistory();
+        HistoryUtils.equipmentExcelHistory();
         return new ByteArrayInputStream(out.toByteArray()); 
     }
     
@@ -359,7 +357,7 @@ public class EquipmentServiceImpl implements EquipmentService{
                equipmentRepository.save(equipment);
            }    
        } 
-       HistoryUtils.uploadEquipment();
+       HistoryUtils.equipmentUploadEquipment(); 
        return  !notIpdeviceList.isEmpty() ?  ResponseEntity.ok(notIpdeviceList) : null; 
     }
 

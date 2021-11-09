@@ -1,11 +1,13 @@
 package com.bezkoder.springjwt.servieImpl;
 
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,8 +28,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.bezkoder.springjwt.common.Constants;
+import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.Equipment;
 import com.bezkoder.springjwt.models.Group;
 import com.bezkoder.springjwt.models.HistoryRecord;
@@ -46,7 +50,6 @@ import lombok.RequiredArgsConstructor;
 public class HistoryServiceImpl  implements HistoryService{
     
     private final HistoryRecordRepository historyRecordRepository;
-    private final HttpServletRequest request;
     
     @Override
     public List<HistoryRecord> getHistoryRecord() {
@@ -59,11 +62,19 @@ public class HistoryServiceImpl  implements HistoryService{
     }
 
     @Override
-    public List<HistoryRecord> getSelectHistory(String[] user,String[] action,String firstDate,String secondDate) {
+    public List<HistoryRecord> getSelectHistory(int size,String user,String action,String firstDate,String secondDate) {
+       String[] users = user.split(",");
+       String[] actions = action.split(",");
+       
+       DateTimeFormatter aformatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+       LocalDateTime startDateTimeChange= LocalDateTime.parse(firstDate.substring(0,14),aformatter);
+       LocalDateTime endDateTimeChange= LocalDateTime.parse(secondDate.substring(0,14),aformatter);
+       String stringStartDate = startDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+       String stringEndDate = endDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-       LocalDateTime firstDates = LocalDateTime.parse(firstDate, formatter);
-       LocalDateTime secondDates = LocalDateTime.parse(secondDate, formatter);
-        return historyRecordRepository.getSelectHistory(user,action,firstDates,secondDates);
+       LocalDateTime firstDates = LocalDateTime.parse(stringStartDate,formatter);
+       LocalDateTime secondDates = LocalDateTime.parse(stringEndDate, formatter);
+       return historyRecordRepository.getSelectHistory(users,actions,firstDates,secondDates,size);
     }
 
 
@@ -169,21 +180,7 @@ public class HistoryServiceImpl  implements HistoryService{
       } catch (Exception e) {
           e.printStackTrace();
       }
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_DOWNLOAD_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_HISTORY_RECORD);
-        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_DOWNLOAD);
-        historyRecord.setTargetName("감사이력리스트.xls");
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_HISTORY_RECORD);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
         return new ByteArrayInputStream(out.toByteArray()); 
-         
     }
     
     private Workbook createWorkbook(String version) {
@@ -195,10 +192,7 @@ public class HistoryServiceImpl  implements HistoryService{
         throw new NoClassDefFoundError();
     }
 
-    @Override
-    public List<HistoryRecord> getTest(String[] user, String[] action) {
-        return historyRecordRepository.getTest(user, action);
-    }
+   
 }
 
 

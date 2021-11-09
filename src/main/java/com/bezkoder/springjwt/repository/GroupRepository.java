@@ -45,6 +45,9 @@ public interface GroupRepository  extends JpaRepository<Group, Integer> {
     @Query("select e.equipment from Equipment e where e.id =:id")
     String findNameEquipmentInteger(@Param("id") Integer id);
     
+    @Query("select g.treeName from Group g where g.id = ?1")
+    String findNameGroupInteger(Integer id);
+    
     @Modifying(clearAutomatically=true)
     @Query(value="insert into group_equipment_join(group_id, equipment_id) values (:parentKey, :deviceKeys)", nativeQuery = true)
     void insertDeviceMapping(@Param("parentKey") Integer parentKey,@Param("deviceKeys") int[] deviceKeys);

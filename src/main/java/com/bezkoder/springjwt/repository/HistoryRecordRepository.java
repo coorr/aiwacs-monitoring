@@ -27,12 +27,20 @@ public interface HistoryRecordRepository extends JpaRepository<HistoryRecord, Lo
     @Query("select u from User u")
     List<User> getHistoryUser();
     
-    @Query("select h from HistoryRecord h where h.userName in (?1) "
-            + "and h.actionType in (?2) and h.workDate between ?3 and ?4 "
-            + "order by h.id desc")
-      List<HistoryRecord> getSelectHistory(String[] user, String[] action, LocalDateTime firstDates, LocalDateTime secondDates);
+//    @Query("select h from HistoryRecord h where h.userName in (?1) "
+//            + "and h.actionType in (?2) and h.workDate between ?3 and ?4 "
+//            + "order by h.id  limit ?5 ")
+//      List<HistoryRecord> getSelectHistory(String[] users, String[] actions, LocalDateTime firstDates, LocalDateTime secondDates,Integer size);
 
-    @Query("select h from HistoryRecord h where h.userName in (?1) and h.actionType in (?2)")
+    
+    @Query(value = "select * from history_record  where user_name in (?1) "
+            + "and action_Type in (?2) and work_Date between ?3 and ?4 "
+            + "order by record_id  limit ?5 ",nativeQuery = true)
+      List<HistoryRecord> getSelectHistory(String[] users, String[] actions, LocalDateTime firstDates, LocalDateTime secondDates,int size);
+
+
+    
+    @Query("select h from HistoryRecord h where h.userName in (?1) or h.actionType in (?2)")
       List<HistoryRecord> getTest(String[] user, String[] action);
 
 }

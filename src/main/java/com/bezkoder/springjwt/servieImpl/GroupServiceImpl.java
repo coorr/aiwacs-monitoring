@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.springjwt.common.Constants;
+import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.Equipment;
 import com.bezkoder.springjwt.models.Group;
 import com.bezkoder.springjwt.models.GroupEquipmentJoin;
@@ -54,14 +55,10 @@ public class GroupServiceImpl implements GroupService {
     
     private final GroupRepository groupRepository;
     private final GroupEquipmentJoinRepository groupEquipmentJoinRepository;
-    private final HistoryRecordRepository historyRecordRepository;
-    private final HttpServletRequest request;
     
     
     @Override
     public List<Object> getGroupEquipment() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        
         List<Object> resultList = new ArrayList<Object>();
         List<Group> groupList = groupRepository.getGroup();  // 0 그룹 출력
         
@@ -77,7 +74,6 @@ public class GroupServiceImpl implements GroupService {
                 resultList.add(groupMap);
             }
             List<Group> childrenList = groupRepository.getGroupSecond(g.getId());  // depth 1
-            
             if(childrenList.size() > 0) {
                for(Group c: childrenList) {
                    Map<String, Object> childrenMap = new HashMap<String, Object>();
@@ -88,7 +84,6 @@ public class GroupServiceImpl implements GroupService {
                    childrenMap.put("children",secondChildren );
                     
                    List<Group> childrenList3 = groupRepository.getGroupSecond(c.getId());  // depth 2
-                   
                    for(Group c3: childrenList3 ) {
                        Map<String, Object> childrenMap3 = new HashMap<String, Object>();
                         List<Object> secondChildren3 = new ArrayList<Object>();
@@ -98,7 +93,6 @@ public class GroupServiceImpl implements GroupService {
                         childrenMap3.put("children",secondChildren3 );
                         
                         List<Equipment> equipment = groupRepository.getEquipment(c3.getId());  // depth 3
-                   
                         if(equipment.size() > 0 ) {
                             for(Equipment e3: equipment) {
                               Map<String, Object> childrenEquipmentMap3 = new HashMap<String, Object>();
@@ -119,10 +113,7 @@ public class GroupServiceImpl implements GroupService {
                         }
                         secondChildren.add(childrenMap3);
                    }
-                   
-                   
                    List<Equipment> equipment = groupRepository.getEquipment(c.getId());
-                   
                     if(equipment.size() > 0 ) {
                        for(Equipment e2: equipment) {
                           Map<String, Object> childrenEquipmentMap = new HashMap<String, Object>();
@@ -139,15 +130,12 @@ public class GroupServiceImpl implements GroupService {
                           childrenEquipmentMap.put("hwCpu", e2.getHwCpu());
                           childrenEquipmentMap.put("group", c.getTreeName());
                           secondChildren.add(childrenEquipmentMap);
-                          
                        }
                     }
                     chilrentStrings.add(childrenMap);
                }
             }
-            
             List<Equipment> equipment = groupRepository.getEquipment(g.getId());
-            
             if(equipment.size() > 0) {
                for(Equipment e : equipment) {
                   Map<String, Object> equipmentMap = new HashMap<String, Object>();
@@ -190,41 +178,11 @@ public class GroupServiceImpl implements GroupService {
         String[] arrayId = groupId.split(",");
         int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
         if(name.equals("parent")) {
-            for(Integer ids : id) {
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                HistoryRecord historyRecord = new HistoryRecord();
-                historyRecord.setUserName(auth.getName());
-                historyRecord.setActionType(Constants.STATUS_DELETE_STRING);
-                historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-                historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
-                historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT);
-                historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
-                historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
-                historyRecord.setSettingIp(request.getRemoteAddr());
-                historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-                LocalDateTime date = LocalDateTime.now().withNano(0);
-                historyRecord.setWorkDate(date);
-                historyRecordRepository.save(historyRecord);
-            }
+            HistoryUtils.deleteGroupHistory(id,name);
             groupRepository.deleteGroup(id);
         } else if(name.equals("children")) {
-            for(Integer ids : id) {
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                HistoryRecord historyRecord = new HistoryRecord();
-                historyRecord.setUserName(auth.getName());
-                historyRecord.setActionType(Constants.STATUS_DELETE_STRING);
-                historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-                historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
-                historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT);
-                historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
-                historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
-                historyRecord.setSettingIp(request.getRemoteAddr());
-                historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-                LocalDateTime date = LocalDateTime.now().withNano(0);
-                historyRecord.setWorkDate(date);
-                historyRecordRepository.save(historyRecord);
-            }
             groupRepository.deleteEquipment(id);
+            HistoryUtils.deleteGroupHistory(id,name);
         } 
         
     }
@@ -234,21 +192,7 @@ public class GroupServiceImpl implements GroupService {
     public void insertGroupFirst(Group group) {
         group.setTreeName(group.getTreeName());
         groupRepository.save(group);
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
-        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT_GROUP);
-        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
-        historyRecord.setTargetName(group.getTreeName());
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+        HistoryUtils.insertGroupHistory(group.getTreeName());
     }
 
     @Transactional
@@ -257,44 +201,14 @@ public class GroupServiceImpl implements GroupService {
         groupEquipmentJoin.setGroup_id(groupEquipmentJoin.getGroup_id());
         groupEquipmentJoin.setEquipment_id(groupEquipmentJoin.getEquipment_id());
         groupEquipmentJoinRepository.save(groupEquipmentJoin);
-        
-        System.out.println(groupRepository.findNameEquipmentInteger(groupEquipmentJoin.getEquipment_id()));
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
-        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT);
-        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
-        historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(groupEquipmentJoin.getEquipment_id()));
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+        HistoryUtils.insertMappingGroupHistory(groupEquipmentJoin.getEquipment_id());
     }
 
     @Transactional
     @Override
     public void updateGroupName(Integer id,Group group) {
         groupRepository.updateGroupName(id,group.getTreeName());
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_UPDATE_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
-        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT_GROUP);
-        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
-        historyRecord.setTargetName(group.getTreeName());
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+        HistoryUtils.updateNameGroupHistory(group.getTreeName());
     }
 
     @Override
@@ -306,21 +220,7 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public void insertGroupSecond(Group group) {
 		groupRepository.save(group);
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        HistoryRecord historyRecord = new HistoryRecord();
-        historyRecord.setUserName(auth.getName());
-        historyRecord.setActionType(Constants.STATUS_CREATE_STRING);
-        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
-        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_MANAGE);
-        historyRecord.setMenuDepth3(Constants.STATUS_DEPTH_EQUIPMENT_GROUP);
-        historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
-        historyRecord.setTargetName(group.getTreeName());
-        historyRecord.setSettingIp(request.getRemoteAddr());
-        historyRecord.setPageURL(Constants.STATUS_URL_MANAGE_EQUIPMENT_LIST);
-        LocalDateTime date = LocalDateTime.now().withNano(0);
-        historyRecord.setWorkDate(date);
-        historyRecordRepository.save(historyRecord);
+		HistoryUtils.insertSecondNameGroupHistory(group.getTreeName());
 	}
     
     @Override
@@ -357,7 +257,6 @@ public class GroupServiceImpl implements GroupService {
                     childrenMap.put("children",secondChildren );
                      
                     List<Group> childrenList3 = groupRepository.getGroupSecond(c.getId());  // depth 2
-                    
                     for(Group c3: childrenList3 ) {
                         Map<String, Object> childrenMap3 = new HashMap<String, Object>();
                          List<Object> secondChildren3 = new ArrayList<Object>();
@@ -367,7 +266,6 @@ public class GroupServiceImpl implements GroupService {
                          childrenMap3.put("children",secondChildren3 );
                          
                          List<Equipment> equipment = groupRepository.searchFilterGroup(c3.getId(),equipTypes,equipCatagorys);  // depth 3
-                    
                          if(equipment.size() > 0 ) {
                              for(Equipment e3: equipment) {
                                Map<String, Object> childrenEquipmentMap3 = new HashMap<String, Object>();
@@ -390,9 +288,7 @@ public class GroupServiceImpl implements GroupService {
                          secondChildren.add(childrenMap3);
                     }
                     
-                    
                     List<Equipment> equipment = groupRepository.searchFilterGroup(c.getId(),equipTypes,equipCatagorys);
-                    
                      if(equipment.size() > 0 ) {
                         for(Equipment e2: equipment) {
                            Map<String, Object> childrenEquipmentMap = new HashMap<String, Object>();
@@ -410,7 +306,6 @@ public class GroupServiceImpl implements GroupService {
                            childrenEquipmentMap.put("hwCpu", e2.getHwCpu());
                            childrenEquipmentMap.put("group", c.getTreeName());
                            secondChildren.add(childrenEquipmentMap);
-                           
                         }
                      }
                      chilrentStrings.add(childrenMap);
@@ -418,7 +313,6 @@ public class GroupServiceImpl implements GroupService {
              }
              
              List<Equipment> equipment = groupRepository.searchFilterGroup(g.getId(),equipTypes,equipCatagorys);
-             
              if(equipment.size() > 0) {
                 for(Equipment e : equipment) {
                    Map<String, Object> equipmentMap = new HashMap<String, Object>();
@@ -451,7 +345,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Transactional
-    @Override
+    @Override // 장비삭제할 때 그룹테이블에도 삭제하기 위한 메소드(history X)
     public void deleteGroupEquipByNo(String equipId) {
        String[] arrayId = equipId.split("\\|");
        int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();   
