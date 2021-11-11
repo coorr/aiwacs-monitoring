@@ -164,7 +164,7 @@ public class HistoryServiceImpl  implements HistoryService{
             Cell bodyCell6 = bodyRow.createCell(6); bodyCell6.setCellValue(dto.getMenuDepth4()); bodyCell6.setCellStyle(bodyStyle);
             Cell bodyCell7 = bodyRow.createCell(7); bodyCell7.setCellValue(dto.getTargetName());    bodyCell7.setCellStyle(bodyStyle);
             Cell bodyCell8 = bodyRow.createCell(8); bodyCell8.setCellValue(dto.getSettingIp()); bodyCell8.setCellStyle(bodyStyle);
-            Cell bodyCell9 = bodyRow.createCell(9); bodyCell9.setCellValue(dto.getPageURL()); bodyCell9.setCellStyle(bodyStyle);
+            Cell bodyCell9 = bodyRow.createCell(9); bodyCell9.setCellValue(dto.getPageUrl()); bodyCell9.setCellStyle(bodyStyle);
             Cell bodyCell10 = bodyRow.createCell(10); bodyCell10.setCellValue(formatDate);  bodyCell10.setCellStyle(bodyStyle); 
             
         }

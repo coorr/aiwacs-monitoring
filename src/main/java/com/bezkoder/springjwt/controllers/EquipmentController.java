@@ -73,7 +73,12 @@ public class EquipmentController {
 	@GetMapping("/getEquipment")
 	public List<Equipment> getEquipments() {
 		return equipmentService.getEquipments();
-	}
+	} 
+	
+	@GetMapping("/getEquipmentSnmp")
+    public List<Equipment> getEquipmentsSnmp() {
+        return equipmentService.getEquipmentsSnmp();
+    }
 	
 	@PostMapping("/equipment/{equipId}")
 	public ResponseEntity<?> updateEquipmentByNo

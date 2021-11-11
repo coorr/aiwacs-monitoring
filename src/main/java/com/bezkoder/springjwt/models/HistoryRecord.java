@@ -35,7 +35,7 @@ public class HistoryRecord {
     private String menuDepth2;  
     private String menuDepth3;  
     private String menuDepth4;  
-    private String pageURL;  
+    private String pageUrl;  
     private String targetName;  
     private String userName;
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

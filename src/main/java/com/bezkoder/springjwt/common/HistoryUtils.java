@@ -73,7 +73,8 @@ public class HistoryUtils {
         historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_LOGIN);
         historyRecord.setTargetName(name);
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        System.out.println(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -88,7 +89,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_DOWNLOAD);
         historyRecord.setTargetName("감사이력리스트.xls");
         historyRecord.setSettingIp(HistoryUtils.getHostIp());
-        historyRecord.setPageURL(Constants.STATUS_URL_HISTORY_RECORD);
+        historyRecord.setPageUrl(Constants.STATUS_URL_HISTORY_RECORD);
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -102,7 +103,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
         historyRecord.setTargetName(targetName);
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -116,7 +117,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
         historyRecord.setTargetName(targetName);
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -131,7 +132,7 @@ public class HistoryUtils {
             historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
             historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
             historyRecord.setSettingIp(getHostIp());
-            historyRecord.setPageURL(request.getHeader("referers"));
+            historyRecord.setPageUrl(request.getHeader("referers"));
             LocalDateTime date = LocalDateTime.now().withNano(0);
             historyRecord.setWorkDate(date);
             historyRecordRepository.save(historyRecord);
@@ -147,7 +148,7 @@ public class HistoryUtils {
             historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
             historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
             historyRecord.setSettingIp(getHostIp());
-            historyRecord.setPageURL(request.getHeader("referers"));
+            historyRecord.setPageUrl(request.getHeader("referers"));
             LocalDateTime date = LocalDateTime.now().withNano(0);
             historyRecord.setWorkDate(date);
             historyRecordRepository.save(historyRecord);
@@ -163,7 +164,7 @@ public class HistoryUtils {
             historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_EQUIPMENT_MANAGE);
             historyRecord.setTargetName(equipmentRepository.findNameInteger(ids));
             historyRecord.setSettingIp(getHostIp());
-            historyRecord.setPageURL(request.getHeader("referers"));
+            historyRecord.setPageUrl(request.getHeader("referers"));
             LocalDateTime date = LocalDateTime.now().withNano(0);
             historyRecord.setWorkDate(date);
             historyRecordRepository.save(historyRecord);
@@ -181,7 +182,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_SYSTEMCYCLE);
         historyRecord.setTargetName(equipmentRepository.findName(id));
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -206,7 +207,7 @@ public class HistoryUtils {
          }
         historyRecord.setTargetName(equipmentRepository.findName(id));
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -221,7 +222,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_DOWNLOAD);
         historyRecord.setTargetName("Devices.xls");
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -236,7 +237,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_UPLOADCREATE);
         historyRecord.setTargetName("Equipment.xls");
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -256,7 +257,7 @@ public class HistoryUtils {
                historyRecord.setTargetName(groupRepository.findNameGroupInteger(ids));
                System.out.println(groupRepository.findNameGroupInteger(ids));
                historyRecord.setSettingIp(getHostIp());
-               historyRecord.setPageURL(request.getHeader("referers"));
+               historyRecord.setPageUrl(request.getHeader("referers"));
                LocalDateTime date = LocalDateTime.now().withNano(0);
                historyRecord.setWorkDate(date);
                historyRecordRepository.save(historyRecord);
@@ -273,7 +274,7 @@ public class HistoryUtils {
                historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
                historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(ids));
                historyRecord.setSettingIp(getHostIp());
-               historyRecord.setPageURL(request.getHeader("referers"));
+               historyRecord.setPageUrl(request.getHeader("referers"));
                LocalDateTime date = LocalDateTime.now().withNano(0);
                historyRecord.setWorkDate(date);
                historyRecordRepository.save(historyRecord);
@@ -291,7 +292,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
         historyRecord.setTargetName(treeName);
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -310,7 +311,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_ASSIGN);
         historyRecord.setTargetName(groupRepository.findNameEquipmentInteger(equipment_id));
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -326,7 +327,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
         historyRecord.setTargetName(treeName);
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
@@ -342,7 +343,7 @@ public class HistoryUtils {
         historyRecord.setMenuDepth4(Constants.STATUS_DEPTH_EQUIPMENT_GROUP_NAME);
         historyRecord.setTargetName(treeName);
         historyRecord.setSettingIp(getHostIp());
-        historyRecord.setPageURL(request.getHeader("referers"));
+        historyRecord.setPageUrl(request.getHeader("referers"));
         LocalDateTime date = LocalDateTime.now().withNano(0);
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);

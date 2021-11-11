@@ -361,6 +361,11 @@ public class EquipmentServiceImpl implements EquipmentService{
        return  !notIpdeviceList.isEmpty() ?  ResponseEntity.ok(notIpdeviceList) : null; 
     }
 
+    @Override
+    public List<Equipment> getEquipmentsSnmp() {
+        return equipmentRepository.findAllsSnmp();
+    }
+
    
   
 

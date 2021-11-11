@@ -20,7 +20,8 @@ public interface EquipmentService {
 	
 	public ResponseEntity<?> updateEquipmentByNo(Integer equipId,EquipmentRequest equipmentRequest);
 	public ResponseEntity<?> createEquipment(EquipmentRequest equipmentRequest);
-	public List<Equipment> getEquipments();
+	public List<Equipment> getEquipments(); 
+	public List<Equipment> getEquipmentsSnmp();
 	public void onActiveEquipment(String equipId);
 	public void offActiveEquipment(String equipId);
 	public void deleteEquipment(String equipId);
