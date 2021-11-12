@@ -26,7 +26,7 @@ public class StatDiskTot {
     @Id
     @SequenceGenerator(name="stat_disk_tot_seq", sequenceName="stat_disk_tot_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="stat_disk_tot_seq")
-    @Column(name="id", unique=true, nullable=false)
+    @Column(name="disktot_id", unique=true, nullable=false)
     private Integer id;
     
     @Temporal(TemporalType.TIMESTAMP)

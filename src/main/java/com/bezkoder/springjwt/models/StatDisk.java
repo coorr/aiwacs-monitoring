@@ -26,7 +26,7 @@ public class StatDisk {
     @Id
     @SequenceGenerator(name="stat_disk_seq", sequenceName="stat_disk_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="stat_disk_seq")
-    @Column(name="id", unique=true, nullable=false)
+    @Column(name="disk_id", unique=true, nullable=false)
     private Integer id;
     
     @Temporal(TemporalType.TIMESTAMP)

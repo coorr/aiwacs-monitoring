@@ -1,31 +1,20 @@
 package com.bezkoder.springjwt.controllers;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bezkoder.springjwt.models.Equipment;
-import com.bezkoder.springjwt.models.Group;
 import com.bezkoder.springjwt.models.HistoryRecord;
 import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.service.EquipmentService;
-import com.bezkoder.springjwt.service.GroupService;
 import com.bezkoder.springjwt.service.HistoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class HistoryController {
 
     private final HistoryService historyService;
-    private final HttpServletRequest request;
     
     @GetMapping("/getHistoryRecord")
     public List<HistoryRecord> getHistoryRecord() {

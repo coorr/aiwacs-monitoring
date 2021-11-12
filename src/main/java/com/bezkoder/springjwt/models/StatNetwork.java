@@ -26,7 +26,7 @@ public class StatNetwork {
     @Id
     @SequenceGenerator(name="stat_network_seq", sequenceName="stat_network_seq", allocationSize=1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="stat_network_seq")
-    @Column(name="id", unique=true, nullable=false)
+    @Column(name="network_id", unique=true, nullable=false)
     private Integer id;
     
     @Temporal(TemporalType.TIMESTAMP)
