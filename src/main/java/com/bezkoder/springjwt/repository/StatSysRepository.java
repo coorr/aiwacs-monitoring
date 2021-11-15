@@ -13,6 +13,7 @@ import com.bezkoder.springjwt.models.StatSys;
 public interface StatSysRepository  extends JpaRepository<StatSys, Integer> {
 
     @Query("select s from StatSys s where s.deviceId = ?1  and s.generateTime between ?2 and ?3 order by s.id desc ")
-    List<StatSys> getSysCpuDisk(Integer id, LocalDateTime startDate, LocalDateTime endDate);
-
+    List<StatSys> getSysCpuMemory(Integer id, LocalDateTime startDate, LocalDateTime endDate);
+    
+    
 }

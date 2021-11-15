@@ -23,8 +23,9 @@ public class ReportStatController {
     private final ReportStatService reportStatService; 
     
     @GetMapping("/getStat")
-    public List<StatSys> getSysCpuDisk(@RequestParam(required = false) Integer id, @RequestParam(required = false) String startDate, 
-                                        @RequestParam(required = false) String endDate) {
-        return reportStatService.getSysCpuDisk(id,startDate,endDate);
+    public List<Object> getSysCpuMemory(@RequestParam(required = false) Integer id, @RequestParam(required = false) Integer cpu, 
+                                        @RequestParam(required = false) Integer network, @RequestParam(required = false) Integer disk,
+                                        @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate) {
+        return reportStatService.getSysCpuMemory(id,cpu,network,disk,startDate,endDate);
     }
 }

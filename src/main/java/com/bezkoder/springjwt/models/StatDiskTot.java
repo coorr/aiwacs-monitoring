@@ -1,6 +1,7 @@
 package com.bezkoder.springjwt.models;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -29,9 +30,7 @@ public class StatDiskTot {
     @Column(name="disktot_id", unique=true, nullable=false)
     private Integer id;
     
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="generate_time")
-    private Date generateTime;
+    private LocalDateTime generateTime;
     
     @Column(name="used_bytes")
     private BigDecimal usedBytes;

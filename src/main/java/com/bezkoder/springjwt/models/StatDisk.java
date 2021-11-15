@@ -1,6 +1,7 @@
 package com.bezkoder.springjwt.models;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -29,9 +30,8 @@ public class StatDisk {
     @Column(name="disk_id", unique=true, nullable=false)
     private Integer id;
     
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="generate_time")
-    private Date generateTime;
+    
+    private LocalDateTime generateTime;
     
     @Column(name="io_queue_depth")
     private BigDecimal ioQueueDepth;
