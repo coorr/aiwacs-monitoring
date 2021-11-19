@@ -13,7 +13,7 @@ import com.bezkoder.springjwt.models.StatNetwork;
 @Repository
 public interface StatDiskTotRepository  extends JpaRepository<StatDiskTot, Integer> {
 
-    @Query("select s from StatDiskTot s where s.deviceId = ?1  and s.generateTime between ?2 and ?3 order by s.id desc ")
-    List<StatDiskTot> getSysCpuMemory(Integer id, LocalDateTime startDate, LocalDateTime endDate);
+    @Query("select s from StatDiskTot s where s.deviceId in (?1)  and s.generateTime between ?2 and ?3 order by s.id desc ")
+    List<StatDiskTot> getSysCpuDiskTotal(int[] ids, LocalDateTime startDate, LocalDateTime endDate);
 
 }

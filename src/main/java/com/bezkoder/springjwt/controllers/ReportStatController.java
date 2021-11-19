@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +23,8 @@ public class ReportStatController {
 
     private final ReportStatService reportStatService; 
     
-    @GetMapping("/getStat")
-    public List<Object> getSysCpuMemory(@RequestParam(required = false) Integer id, @RequestParam(required = false) Integer cpu, 
+    @GetMapping("/getStat/{id}")
+    public List<Object> getSysCpuMemory(@PathVariable("id") String id, @RequestParam(required = false) Integer cpu, 
                                         @RequestParam(required = false) Integer network, @RequestParam(required = false) Integer disk,
                                         @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate) {
         return reportStatService.getSysCpuMemory(id,cpu,network,disk,startDate,endDate);

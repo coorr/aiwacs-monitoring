@@ -3,12 +3,14 @@ package com.bezkoder.springjwt.servieImpl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.springjwt.models.StatDisk;
+import com.bezkoder.springjwt.models.StatDiskTot;
 import com.bezkoder.springjwt.models.StatNetwork;
 import com.bezkoder.springjwt.models.StatSys;
 import com.bezkoder.springjwt.repository.StatDiskRepository;
@@ -30,7 +32,12 @@ public class ReportStatServiceImpl implements ReportStatService {
     private final StatNetworkRepository statNetworkRepository;
     
     @Override
-    public List<Object> getSysCpuMemory(Integer id,Integer cpu,Integer network,Integer disk, String startDate,String endDate) {
+    public List<Object> getSysCpuMemory(String id,Integer cpu,Integer network,Integer disk, String startDate,String endDate) {
+        System.out.println("aa" + id);
+        String[] arrayId = id.split("\\|");
+        
+        int[] ids=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();
+        System.out.println(ids);
         
         DateTimeFormatter aformatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime startDateTimeChange= LocalDateTime.parse(startDate.substring(0,14),aformatter);
@@ -44,19 +51,38 @@ public class ReportStatServiceImpl implements ReportStatService {
         List<Object> resultList = new ArrayList<Object>();
         
         if(cpu == 1) {
-            List<StatSys> statSys = statSysRepository.getSysCpuMemory(id, firstDates, secondDates);
+            List<StatSys> statSys = statSysRepository.getSysCpuMemory(ids, firstDates, secondDates);
             resultList.add(statSys); 
         } 
         if(network == 1) {
-            List<StatNetwork> statNetworks = statNetworkRepository.getSysNetwork(id, firstDates, secondDates);
+            List<StatNetwork> statNetworks = statNetworkRepository.getSysNetwork(ids, firstDates, secondDates);
             resultList.add(statNetworks); 
         }
         if(disk == 1) {
-            List<StatDisk> statDisks = statDiskRepository.getSysCpuDisk(id, firstDates, secondDates);   
+            List<StatDisk> statDisks = statDiskRepository.getSysCpuDisk(ids, firstDates, secondDates);   
             resultList.add(statDisks); 
+        }
+        if(disk == 1) {
+            List<StatDiskTot> statDiskTotks = statDiskTotRepository.getSysCpuDiskTotal(ids, startDateTimeChange, endDateTimeChange);
+            resultList.add(statDiskTotks);
         }
         
          
          return resultList;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

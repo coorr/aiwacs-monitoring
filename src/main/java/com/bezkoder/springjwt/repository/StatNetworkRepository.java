@@ -13,7 +13,7 @@ import com.bezkoder.springjwt.models.StatSys;
 @Repository
 public interface StatNetworkRepository  extends JpaRepository<StatNetwork, Integer> {
 
-    @Query("select s from StatNetwork s where s.deviceId = ?1  and s.generateTime between ?2 and ?3 order by s.id desc ")
-    List<StatNetwork> getSysNetwork(Integer id, LocalDateTime startDate, LocalDateTime endDate);
+    @Query("select s from StatNetwork s where s.deviceId in (?1)  and s.generateTime between ?2 and ?3 order by s.id desc ")
+    List<StatNetwork> getSysNetwork(int[] ids, LocalDateTime startDate, LocalDateTime endDate);
 
 }
