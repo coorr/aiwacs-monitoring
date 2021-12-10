@@ -1,7 +1,8 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.text.ParseException;
 import java.util.List;
-
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,4 +30,13 @@ public class ReportStatController {
                                         @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate) {
         return reportStatService.getSysCpuMemory(id,cpu,network,disk,startDate,endDate);
     }
+    
+    @GetMapping("/getStatistics/{id}")
+    public Map<String, Object> getStatistics(@PathVariable("id") String id, 
+            @RequestParam(required = false) Integer sys, @RequestParam(required = false) Integer disk, @RequestParam(required = false) Integer nic, 
+            @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate) throws ParseException {
+        
+        return reportStatService.getStatistics(id, sys, disk, nic, startDate, endDate);
+    }
+    
 }
