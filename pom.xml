@@ -105,7 +105,31 @@
            <artifactId>json</artifactId>
            <version>20201115</version>
         </dependency>
+        
+        <!-- PDF REPORT -->
+        <dependency>
+           <groupId>com.lowagie</groupId>
+           <artifactId>itext</artifactId>
+           <version>2.1.7</version>
+       </dependency>
+        
+        <dependency>
+           <groupId>jfree</groupId>
+           <artifactId>jfreechart</artifactId>
+           <version>1.0.13</version>
+       </dependency>
+       
+       <dependency>
+           <groupId>org.jfree</groupId>
+           <artifactId>jcommon</artifactId>
+           <version>1.0.24</version>
+       </dependency>
 
+       <dependency>
+           <groupId>com.orsonpdf</groupId>
+           <artifactId>orsonpdf</artifactId>
+           <version>1.7</version>
+       </dependency>
        
 
        
