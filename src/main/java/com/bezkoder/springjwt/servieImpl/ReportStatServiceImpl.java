@@ -1,8 +1,9 @@
 package com.bezkoder.springjwt.servieImpl;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,13 +16,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
+import org.apache.poi.xddf.usermodel.chart.XDDFArea3DChartData.Series;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.hibernate.internal.build.AllowSysOut;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.ui.HorizontalAlignment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.aop.support.AopUtils;
@@ -38,19 +49,25 @@ import com.bezkoder.springjwt.repository.StatNetworkRepository;
 import com.bezkoder.springjwt.repository.StatSysRepository;
 import com.bezkoder.springjwt.service.ReportStatService;
 import com.itextpdf.text.pdf.PdfGraphics2D;
+import com.lowagie.text.Cell;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
+import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.Row;
+import com.lowagie.text.Table;
+import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.DefaultFontMapper;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfTable;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
 import com.orsonpdf.PDFGraphics2D;
@@ -167,20 +184,13 @@ public class ReportStatServiceImpl implements ReportStatService {
         String stringStartDate = startDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String stringEndDate = endDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String device = jObject.getString("device");
+        String[] deviceArray = device.split("\\|");
         device = device.replace("|"," , ");
         
         JSONArray iObject = jObject.getJSONArray("chart");
-        System.out.println(iObject);
-        System.out.println(iObject.length());
-        System.out.println(iObject.get(0));
         JSONObject zObject = new JSONObject(iObject.get(0));
-        System.out.println(zObject);
-//        for(int j=0; j < iObject.length(); j++) {
-//            String resourceName = iObject.getString(j);
-//            System.out.println(resourceName);
-//        }
-//        String resourceName = iObject.getString("resourceName");
-//        System.out.println(resourceName);
+        
+        
         
         
         try {
@@ -207,39 +217,93 @@ public class ReportStatServiceImpl implements ReportStatService {
             doc.add(selectTime);
             Paragraph userName = new Paragraph("사용자 : "+users,contentFont);
             userName.setAlignment(Element.ALIGN_LEFT);
+            userName.setSpacingAfter(10);
             doc.add(userName);
             
             float width = PageSize.A4.getWidth();  // 595
             float height = PageSize.A4.getHeight();   // 842
             
             
-            
-            
             DefaultCategoryDataset mychartData=new DefaultCategoryDataset();
+            float y = writer.getPageSize().getTop();
+            System.out.println(y);
             
-//            for(int i=0; i<iObject.length(); i++) {
-//                System.out.println(i);
-//                
-//            }
-            mychartData.setValue(90,"","English"); 
-            mychartData.setValue(78,"","Maths");
-            mychartData.setValue(40,"","Science");
-            mychartData.setValue(89,"","History");
-            mychartData.setValue(89,"","asdasd");
-            
-            JFreeChart my2DChart=ChartFactory.createLineChart("Mark Details",null,null,mychartData,PlotOrientation.VERTICAL,false,true,false);
-            PdfContentByte Add_Chart_Content = writer.getDirectContent();  // 차트 내용 선언
-            PdfTemplate template_Chart_Holder = Add_Chart_Content.createTemplate(595, 842);  // 차트 크기설정
-            Graphics2D Graphics_Chart = template_Chart_Holder.createGraphics(595, 842, new DefaultFontMapper());
-            Rectangle2D Chart_Region = new Rectangle2D.Double(70, 200, 450, 210); // margin(x,y,w,h)
-            my2DChart.draw(Graphics_Chart, Chart_Region);
-            Graphics_Chart.dispose();
-            Add_Chart_Content.addTemplate(template_Chart_Holder, 0, 0);
-            
-            
-            
+            for(int z=0; z< iObject.length(); z++) {
+                JSONObject imsi = (JSONObject) iObject.get(z);
+                String resourceName = imsi.getString("resourceName");
+                JSONObject option = imsi.getJSONObject("option");
+                JSONObject xAxis = option.getJSONObject("xAxis");
+                JSONArray series = option.getJSONArray("series");
+                JSONArray categoriesList = xAxis.getJSONArray("categories");
+                JSONObject seriesData = (JSONObject) series.get(0);
+                JSONArray seriesList = seriesData.getJSONArray("data");
+                
+                List<Object> testa = new ArrayList<>();
+                testa.add(series.get(0));
+                
+                List<String> categories = new ArrayList<String>();
+                String[] stringArray = null;
+                Integer[] seriesArray = null;
+                stringArray = new String[categoriesList.length()];
+                seriesArray = new Integer[seriesList.length()];
+                
+                for(int a=0; a<categoriesList.length(); a++) {
+                    stringArray[a] = categoriesList.optString(a);
+                    seriesArray[a] = seriesList.optInt(a);
+                    
+                    Date dates = outFormat.parse(stringArray[a]);
+                    SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
+                    stringArray[a] = cateDateFormat.format(dates);
+                    mychartData.setValue(seriesArray[a], "Test",stringArray[a]);
+                }
+                JFreeChart chart=ChartFactory.createLineChart(resourceName,null,null,mychartData,PlotOrientation.VERTICAL,true,true,false);
+                chart.getTitle().setHorizontalAlignment(HorizontalAlignment.LEFT);
+                chart.getTitle().setFont(new java.awt.Font(resourceName, java.awt.Font.BOLD, 12));
+                chart.getPlot().setBackgroundPaint(new Color(236,236,236));
+                chart.getLegend().setItemFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 10));  // legend 한글 아직 안먹음
+                chart.getLegend().setFrame(BlockBorder.NONE);
+                
+                PdfContentByte Add_Chart_Content = writer.getDirectContent();  // 차트 내용 선언
+                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(700, 950);  // 차트 크기설정
+                Graphics2D Graphics_Chart = Template_Chart_Holder.createGraphics(650, 880, new DefaultFontMapper()); // 차트 x,y 조절
+                
+                PdfPTable table = new PdfPTable(3); // 3 columns.
+
+                PdfPCell cell1 = new PdfPCell(new Paragraph("Time"));
+                PdfPCell cell2 = new PdfPCell(new Paragraph("Cell 2"));
+
+                table.addCell(cell1);
+                table.addCell(cell2);
+                doc.add(table);
+                
+                
+                
+                CategoryAxis domainAxis = chart.getCategoryPlot().getDomainAxis();
+                domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.0));
+                domainAxis.setTickLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 10));
+                CategoryPlot plot = chart.getCategoryPlot();
+                plot.getDomainAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
+                plot.getRangeAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
+                plot.getLegendItems().get(0).setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 10));
+                
+                if(z == 0) {
+                    Rectangle2D Chart_Region = new Rectangle2D.Double(30, 200, 520, 300); // margin(x,y,w,h)
+//                    chart.draw(Graphics_Chart, Chart_Region);
+                } else {
+                    Rectangle2D Chart_Region = new Rectangle2D.Double(30, 80, 520, 300); // margin(x,y,w,h)
+//                    chart.draw(Graphics_Chart, Chart_Region);
+                }
+                
+                Graphics_Chart.dispose();
+                Add_Chart_Content.addTemplate(Template_Chart_Holder, 0, 0);
+                
+               
+                
+                doc.newPage();
+            }
             doc.close();
         } catch (Exception e) {
+            System.out.println(e);
         } 
         return new ByteArrayInputStream(out.toByteArray());
     }

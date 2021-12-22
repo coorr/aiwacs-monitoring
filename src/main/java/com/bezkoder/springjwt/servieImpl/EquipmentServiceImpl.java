@@ -267,10 +267,10 @@ public class EquipmentServiceImpl implements EquipmentService{
             Cell bodyCell4 = bodyRow.createCell(4); bodyCell4.setCellValue(dto.getSettingIp()); bodyCell4.setCellStyle(bodyStyle);
             Cell bodyCell5 = bodyRow.createCell(5); bodyCell5.setCellValue(dto.getSettingType()); bodyCell5.setCellStyle(bodyStyle);
             Cell bodyCell6 = bodyRow.createCell(6); bodyCell6.setCellValue(dto.getSettingCatagory());bodyCell6.setCellStyle(bodyStyle);
-            Cell bodyCell7 = bodyRow.createCell(7);     bodyCell7.setCellStyle(bodyStyle);
+            Cell bodyCell7 = bodyRow.createCell(7); bodyCell7.setCellStyle(bodyStyle);
             Cell bodyCell8 = bodyRow.createCell(8); bodyCell8.setCellValue(dto.getSettingOs()); bodyCell8.setCellStyle(bodyStyle);
             Cell bodyCell9 = bodyRow.createCell(9); bodyCell9.setCellValue(dto.getSettingPerson()); bodyCell9.setCellStyle(bodyStyle);
-            Cell bodyCell10 = bodyRow.createCell(10);   bodyCell10.setCellStyle(bodyStyle);
+            Cell bodyCell10 = bodyRow.createCell(10); bodyCell10.setCellStyle(bodyStyle);
             Cell bodyCell11 = bodyRow.createCell(11); bodyCell11.setCellValue(dto.isSettingActive() ? "활성"  : "비활성" ); bodyCell11.setCellStyle(bodyStyleCenter);
             Cell bodyCell12 = bodyRow.createCell(12); bodyCell12.setCellValue(dto.getSettingProxy()); bodyCell12.setCellStyle(bodyStyle);
             Cell bodyCell13 = bodyRow.createCell(13); bodyCell13.setCellValue(dto.getSettingTemplate()); bodyCell13.setCellStyle(bodyStyle);
