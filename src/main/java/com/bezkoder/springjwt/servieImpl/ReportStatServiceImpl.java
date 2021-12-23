@@ -16,9 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
-import org.apache.poi.xddf.usermodel.chart.XDDFArea3DChartData.Series;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.hibernate.internal.build.AllowSysOut;
 import org.jfree.chart.ChartFactory;
@@ -35,6 +33,9 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.ui.HorizontalAlignment;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleElement;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ import com.bezkoder.springjwt.repository.StatDiskTotRepository;
 import com.bezkoder.springjwt.repository.StatNetworkRepository;
 import com.bezkoder.springjwt.repository.StatSysRepository;
 import com.bezkoder.springjwt.service.ReportStatService;
+import com.fasterxml.jackson.core.JsonParser;
 import com.itextpdf.text.pdf.PdfGraphics2D;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Document;
@@ -64,6 +66,7 @@ import com.lowagie.text.Table;
 import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.DefaultFontMapper;
+import com.lowagie.text.pdf.PdfCell;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -164,7 +167,7 @@ public class ReportStatServiceImpl implements ReportStatService {
     }
 
     @Override
-    public ByteArrayInputStream getReportDownloadPdf(String chartData) throws IOException {
+    public ByteArrayInputStream getReportDownloadPdf(String chartData) throws IOException, ParseException {
         System.out.println(chartData);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream(); 
@@ -173,6 +176,29 @@ public class ReportStatServiceImpl implements ReportStatService {
         DateTimeFormatter dateFormat= DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         Date time = new Date();
         String outTime = outFormat.format(time);
+        
+        JSONParser parser = new JSONParser();
+        org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(chartData);
+        org.json.simple.JSONArray chartAry = (org.json.simple.JSONArray) jsonObject.get("chart");
+        
+        
+        for(int i=0;i<chartAry.size();i++) {
+            org.json.simple.JSONObject chartObj = (org.json.simple.JSONObject) chartAry.get(i);
+            
+            if(chartObj.get("seriesData") != null) {
+                org.json.simple.JSONArray gridAry = (org.json.simple.JSONArray) chartObj.get("seriesData");
+                
+                for(int j=0;j<gridAry.size();j++) {
+                    org.json.simple.JSONArray innerArray = (org.json.simple.JSONArray) gridAry.get(j);
+                    
+                    System.out.println(innerArray);
+                    
+                    String key = innerArray.get(0).toString();
+                    String val = innerArray.get(1).toString();
+                }
+            }
+            
+        }
         
         JSONObject jObject = new JSONObject(chartData);
         System.out.println(jObject);
@@ -220,8 +246,8 @@ public class ReportStatServiceImpl implements ReportStatService {
             userName.setSpacingAfter(10);
             doc.add(userName);
             
-            float width = PageSize.A4.getWidth();  // 595
-            float height = PageSize.A4.getHeight();   // 842
+            float width = PageSize.A4.getWidth() - 20;  // 595
+            float height = 300;  // 842
             
             
             DefaultCategoryDataset mychartData=new DefaultCategoryDataset();
@@ -232,30 +258,56 @@ public class ReportStatServiceImpl implements ReportStatService {
                 JSONObject imsi = (JSONObject) iObject.get(z);
                 String resourceName = imsi.getString("resourceName");
                 JSONObject option = imsi.getJSONObject("option");
+                JSONArray gridData = imsi.getJSONArray("seriesData");
+                
                 JSONObject xAxis = option.getJSONObject("xAxis");
                 JSONArray series = option.getJSONArray("series");
                 JSONArray categoriesList = xAxis.getJSONArray("categories");
                 JSONObject seriesData = (JSONObject) series.get(0);
                 JSONArray seriesList = seriesData.getJSONArray("data");
-                
-                List<Object> testa = new ArrayList<>();
-                testa.add(series.get(0));
-                
-                List<String> categories = new ArrayList<String>();
+                System.out.println(resourceName);
+               
                 String[] stringArray = null;
                 Integer[] seriesArray = null;
+                
                 stringArray = new String[categoriesList.length()];
                 seriesArray = new Integer[seriesList.length()];
                 
-                for(int a=0; a<categoriesList.length(); a++) {
+                JSONArray gridDataAryLength = (JSONArray) gridData.get(0);
+                PdfPTable table = new PdfPTable(gridDataAryLength.length()); 
+                
+                Font gridFont1 = new Font(bFont,10, Font.NORMAL);
+                PdfPCell c1 = new PdfPCell(new Phrase(gridDataAryLength.get(0).toString(),gridFont1));
+                c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                c1.setBackgroundColor(Color.LIGHT_GRAY);
+                table.addCell(c1);
+                c1 = new PdfPCell(new Phrase(gridDataAryLength.get(1).toString(),gridFont1));
+                c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                c1.setBackgroundColor(Color.LIGHT_GRAY);
+                table.addCell(c1);
+                
+                PdfPCell cell2 = new PdfPCell();
+                
+                
+                for(int a=0; a < categoriesList.length(); a++) {
                     stringArray[a] = categoriesList.optString(a);
                     seriesArray[a] = seriesList.optInt(a);
+                    
+                    JSONArray gridDataAry = (JSONArray) gridData.get(a+1);
+                    for(int b=0; b<gridDataAry.length(); b++) {
+                        Font gridFont1_1 = new Font(bFont,9, Font.NORMAL);
+                        PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
+                        c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        table.addCell(c1_1);
+                    }
                     
                     Date dates = outFormat.parse(stringArray[a]);
                     SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
                     stringArray[a] = cateDateFormat.format(dates);
-                    mychartData.setValue(seriesArray[a], "Test",stringArray[a]);
+                    mychartData.setValue(seriesArray[a], "Test",stringArray[a]);  // Comparable 형태를 맞추기 위해 String[] 변환
                 }
+                
+                
                 JFreeChart chart=ChartFactory.createLineChart(resourceName,null,null,mychartData,PlotOrientation.VERTICAL,true,true,false);
                 chart.getTitle().setHorizontalAlignment(HorizontalAlignment.LEFT);
                 chart.getTitle().setFont(new java.awt.Font(resourceName, java.awt.Font.BOLD, 12));
@@ -264,19 +316,8 @@ public class ReportStatServiceImpl implements ReportStatService {
                 chart.getLegend().setFrame(BlockBorder.NONE);
                 
                 PdfContentByte Add_Chart_Content = writer.getDirectContent();  // 차트 내용 선언
-                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(700, 950);  // 차트 크기설정
+                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(600, 850);  // 차트 크기설정(700,950)
                 Graphics2D Graphics_Chart = Template_Chart_Holder.createGraphics(650, 880, new DefaultFontMapper()); // 차트 x,y 조절
-                
-                PdfPTable table = new PdfPTable(3); // 3 columns.
-
-                PdfPCell cell1 = new PdfPCell(new Paragraph("Time"));
-                PdfPCell cell2 = new PdfPCell(new Paragraph("Cell 2"));
-
-                table.addCell(cell1);
-                table.addCell(cell2);
-                doc.add(table);
-                
-                
                 
                 CategoryAxis domainAxis = chart.getCategoryPlot().getDomainAxis();
                 domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.0));
@@ -288,18 +329,19 @@ public class ReportStatServiceImpl implements ReportStatService {
                 
                 if(z == 0) {
                     Rectangle2D Chart_Region = new Rectangle2D.Double(30, 200, 520, 300); // margin(x,y,w,h)
-//                    chart.draw(Graphics_Chart, Chart_Region);
+                    chart.draw(Graphics_Chart, Chart_Region);
                 } else {
                     Rectangle2D Chart_Region = new Rectangle2D.Double(30, 80, 520, 300); // margin(x,y,w,h)
 //                    chart.draw(Graphics_Chart, Chart_Region);
                 }
                 
                 Graphics_Chart.dispose();
-                Add_Chart_Content.addTemplate(Template_Chart_Holder, 0, 0);
-                
-               
-                
-                doc.newPage();
+                Image chartImage = Image.getInstance(Template_Chart_Holder);
+                doc.add(chartImage);
+//                Add_Chart_Content.addTemplate(Template_Chart_Holder, 0, 0);
+                doc.add(table);
+                System.out.println(y);
+                System.out.println(writer.getPageSize());
             }
             doc.close();
         } catch (Exception e) {

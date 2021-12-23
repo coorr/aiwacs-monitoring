@@ -45,7 +45,7 @@ public class ReportStatController {
     }
     
     @PostMapping("/getReportDownloadPdf") 
-    public ResponseEntity<InputStreamResource> getReportDownloadPdf(@RequestBody String chartData) throws IOException {
+    public ResponseEntity<InputStreamResource> getReportDownloadPdf(@RequestBody String chartData) throws IOException, org.json.simple.parser.ParseException {
         ByteArrayInputStream  responseFile = reportStatService.getReportDownloadPdf(chartData);
         return ResponseEntity
                 .ok()
