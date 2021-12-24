@@ -77,6 +77,7 @@ import com.orsonpdf.PDFGraphics2D;
 import com.orsonpdf.Page;
 
 import aj.org.objectweb.asm.Type;
+import ch.qos.logback.core.joran.conditional.ElseAction;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -176,32 +177,8 @@ public class ReportStatServiceImpl implements ReportStatService {
         DateTimeFormatter dateFormat= DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         Date time = new Date();
         String outTime = outFormat.format(time);
-        
-        JSONParser parser = new JSONParser();
-        org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(chartData);
-        org.json.simple.JSONArray chartAry = (org.json.simple.JSONArray) jsonObject.get("chart");
-        
-        
-        for(int i=0;i<chartAry.size();i++) {
-            org.json.simple.JSONObject chartObj = (org.json.simple.JSONObject) chartAry.get(i);
-            
-            if(chartObj.get("seriesData") != null) {
-                org.json.simple.JSONArray gridAry = (org.json.simple.JSONArray) chartObj.get("seriesData");
-                
-                for(int j=0;j<gridAry.size();j++) {
-                    org.json.simple.JSONArray innerArray = (org.json.simple.JSONArray) gridAry.get(j);
-                    
-                    System.out.println(innerArray);
-                    
-                    String key = innerArray.get(0).toString();
-                    String val = innerArray.get(1).toString();
-                }
-            }
-            
-        }
-        
+
         JSONObject jObject = new JSONObject(chartData);
-        System.out.println(jObject);
         String users = jObject.getString("user");
         String startDate = jObject.getString("startDate");
         String endDate = jObject.getString("endDate");
@@ -246,65 +223,71 @@ public class ReportStatServiceImpl implements ReportStatService {
             userName.setSpacingAfter(10);
             doc.add(userName);
             
-            float width = PageSize.A4.getWidth() - 20;  // 595
-            float height = 300;  // 842
+            float width = PageSize.A4.getWidth() - 75;  // 595
+            float height = 280;  // 842
             
             
-            DefaultCategoryDataset mychartData=new DefaultCategoryDataset();
-            float y = writer.getPageSize().getTop();
-            System.out.println(y);
-            
+            System.out.println(iObject.length());
             for(int z=0; z< iObject.length(); z++) {
+                DefaultCategoryDataset mychartData=new DefaultCategoryDataset();
                 JSONObject imsi = (JSONObject) iObject.get(z);
                 String resourceName = imsi.getString("resourceName");
+                String deviceNames = imsi.getString("deviceName");
                 JSONObject option = imsi.getJSONObject("option");
-                JSONArray gridData = imsi.getJSONArray("seriesData");
+//                JSONArray gridData = imsi.getJSONArray("seriesData");
                 
                 JSONObject xAxis = option.getJSONObject("xAxis");
                 JSONArray series = option.getJSONArray("series");
                 JSONArray categoriesList = xAxis.getJSONArray("categories");
-                JSONObject seriesData = (JSONObject) series.get(0);
-                JSONArray seriesList = seriesData.getJSONArray("data");
+                
                 System.out.println(resourceName);
-               
-                String[] stringArray = null;
-                Integer[] seriesArray = null;
+                String[] categoryArray = null;
                 
-                stringArray = new String[categoriesList.length()];
-                seriesArray = new Integer[seriesList.length()];
-                
-                JSONArray gridDataAryLength = (JSONArray) gridData.get(0);
-                PdfPTable table = new PdfPTable(gridDataAryLength.length()); 
-                
-                Font gridFont1 = new Font(bFont,10, Font.NORMAL);
-                PdfPCell c1 = new PdfPCell(new Phrase(gridDataAryLength.get(0).toString(),gridFont1));
-                c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-                c1.setBackgroundColor(Color.LIGHT_GRAY);
-                table.addCell(c1);
-                c1 = new PdfPCell(new Phrase(gridDataAryLength.get(1).toString(),gridFont1));
-                c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-                c1.setBackgroundColor(Color.LIGHT_GRAY);
-                table.addCell(c1);
-                
-                PdfPCell cell2 = new PdfPCell();
-                
-                
-                for(int a=0; a < categoriesList.length(); a++) {
-                    stringArray[a] = categoriesList.optString(a);
-                    seriesArray[a] = seriesList.optInt(a);
+                if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
+                   resourceName.equals("CPU Run Queue")         ||resourceName.equals("CPU Core") || 
+                   resourceName.equals("Load Avg")) {
+                    JSONObject seriesData = (JSONObject) series.get(0);
+                    JSONArray seriesList = seriesData.getJSONArray("data");
+                   
+                    Integer[] seriesArray = null;
                     
-                    JSONArray gridDataAry = (JSONArray) gridData.get(a+1);
-                    for(int b=0; b<gridDataAry.length(); b++) {
-                        Font gridFont1_1 = new Font(bFont,9, Font.NORMAL);
-                        PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
-                        c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                        table.addCell(c1_1);
+                    categoryArray = new String[categoriesList.length()];
+                    seriesArray = new Integer[seriesList.length()];
+                    
+                    for(int a=0; a < categoriesList.length(); a++) {
+                        categoryArray[a] = categoriesList.optString(a);
+                        seriesArray[a] = seriesList.optInt(a);
+                        
+                        Date dates = outFormat.parse(categoryArray[a]);
+                        SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
+                        categoryArray[a] = cateDateFormat.format(dates);
+                        mychartData.setValue(seriesArray[a], deviceNames  ,categoryArray[a]);  // Comparable 형태를 맞추기 위해 String[] 변환
+                    } 
+                } else if(resourceName.equals("Network Traffic")     || resourceName.equals("Network PPS") ||
+                          resourceName.equals("NIC Discards")        || resourceName.equals("NIC Errors")) {
+                    Integer[] partitionDataAry =  null;
+                    
+                    for(int w=0; w<series.length(); w++) {
+                        JSONObject seriesData = (JSONObject) series.get(w);
+                        JSONArray seriesList = seriesData.getJSONArray("data");
+                        String seriesPartition = seriesData.getString("name");
+                        
+                        categoryArray = new String[categoriesList.length()];
+                        partitionDataAry = new Integer[seriesList.length()];
+                        System.out.println(seriesData);
+                        
+                        for(int a=0; a < categoriesList.length(); a++) {
+                            categoryArray[a] = categoriesList.optString(a);
+                            System.out.println(categoryArray[a]);
+                            partitionDataAry[a] = seriesList.optInt(a);
+                            System.out.println(partitionDataAry[a]);
+                            
+                            Date dates = outFormat.parse(categoryArray[a]);
+                            SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
+                            categoryArray[a] = cateDateFormat.format(dates);
+                            mychartData.setValue(partitionDataAry[a], seriesPartition , categoryArray[a]);
+                        } 
                     }
-                    
-                    Date dates = outFormat.parse(stringArray[a]);
-                    SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
-                    stringArray[a] = cateDateFormat.format(dates);
-                    mychartData.setValue(seriesArray[a], "Test",stringArray[a]);  // Comparable 형태를 맞추기 위해 String[] 변환
                 }
                 
                 
@@ -312,12 +295,12 @@ public class ReportStatServiceImpl implements ReportStatService {
                 chart.getTitle().setHorizontalAlignment(HorizontalAlignment.LEFT);
                 chart.getTitle().setFont(new java.awt.Font(resourceName, java.awt.Font.BOLD, 12));
                 chart.getPlot().setBackgroundPaint(new Color(236,236,236));
-                chart.getLegend().setItemFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 10));  // legend 한글 아직 안먹음
+                chart.getLegend().setItemFont(new java.awt.Font("돋움", java.awt.Font.PLAIN, 10));  // legend 한글 아직 안먹음
                 chart.getLegend().setFrame(BlockBorder.NONE);
-                
+
                 PdfContentByte Add_Chart_Content = writer.getDirectContent();  // 차트 내용 선언
-                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(600, 850);  // 차트 크기설정(700,950)
-                Graphics2D Graphics_Chart = Template_Chart_Holder.createGraphics(650, 880, new DefaultFontMapper()); // 차트 x,y 조절
+                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(595, 300);  // 차트 크기설정(700,950)
+                Graphics2D Graphics_Chart = Template_Chart_Holder.createGraphics(595, 300, new DefaultFontMapper()); // 차트 x,y 조절
                 
                 CategoryAxis domainAxis = chart.getCategoryPlot().getDomainAxis();
                 domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.0));
@@ -325,23 +308,49 @@ public class ReportStatServiceImpl implements ReportStatService {
                 CategoryPlot plot = chart.getCategoryPlot();
                 plot.getDomainAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
                 plot.getRangeAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
-                plot.getLegendItems().get(0).setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 10));
                 
-                if(z == 0) {
-                    Rectangle2D Chart_Region = new Rectangle2D.Double(30, 200, 520, 300); // margin(x,y,w,h)
-                    chart.draw(Graphics_Chart, Chart_Region);
-                } else {
-                    Rectangle2D Chart_Region = new Rectangle2D.Double(30, 80, 520, 300); // margin(x,y,w,h)
-//                    chart.draw(Graphics_Chart, Chart_Region);
-                }
+                Rectangle2D Chart_Region = new Rectangle2D.Double(10, 10, width, height); // margin(x,y) , size(w,h)
+                chart.draw(Graphics_Chart, Chart_Region);  
                 
                 Graphics_Chart.dispose();
                 Image chartImage = Image.getInstance(Template_Chart_Holder);
                 doc.add(chartImage);
-//                Add_Chart_Content.addTemplate(Template_Chart_Holder, 0, 0);
-                doc.add(table);
-                System.out.println(y);
-                System.out.println(writer.getPageSize());
+                
+//                JSONArray gridDataAryLength = (JSONArray) gridData.get(0);
+//                PdfPTable table = new PdfPTable(gridDataAryLength.length()); 
+//                if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
+//                        resourceName.equals("CPU Run Queue")         ||resourceName.equals("CPU Core") || 
+//                        resourceName.equals("Load Avg")) {
+//                    table.setWidthPercentage(95);
+//                    
+//                    Font gridFont1 = new Font(bFont,10, Font.NORMAL);
+//                    PdfPCell c1 = new PdfPCell(new Phrase(gridDataAryLength.get(0).toString(),gridFont1));
+//                    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+//                    c1.setBackgroundColor(Color.LIGHT_GRAY);
+//                    table.addCell(c1);
+//                    c1 = new PdfPCell(new Phrase(gridDataAryLength.get(1).toString(),gridFont1));
+//                    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+//                    c1.setBackgroundColor(Color.LIGHT_GRAY);
+//                    table.addCell(c1);
+//                    
+//                    for(int q=0; q< gridData.length(); q++) {
+//                        JSONArray gridDataAry = (JSONArray) gridData.get(q);
+//                        for(int b=0; b<gridDataAry.length(); b++) {
+//                            if(q != 0 ) {
+//                                Font gridFont1_1 = new Font(bFont,9, Font.NORMAL);
+//                                PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
+//                                c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+//                                c1_1.setFixedHeight(15f);
+//                                table.addCell(c1_1);
+//                            }
+//                            
+//                        }
+//                    }
+//                } 
+                  
+               
+                
+//                doc.add(table);
             }
             doc.close();
         } catch (Exception e) {
