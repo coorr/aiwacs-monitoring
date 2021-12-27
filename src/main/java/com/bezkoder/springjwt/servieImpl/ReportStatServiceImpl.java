@@ -50,6 +50,7 @@ import com.bezkoder.springjwt.repository.StatNetworkRepository;
 import com.bezkoder.springjwt.repository.StatSysRepository;
 import com.bezkoder.springjwt.service.ReportStatService;
 import com.fasterxml.jackson.core.JsonParser;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.pdf.PdfGraphics2D;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Document;
@@ -63,6 +64,7 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.Row;
 import com.lowagie.text.Table;
+import com.lowagie.text.html.WebColors;
 import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.DefaultFontMapper;
@@ -234,7 +236,7 @@ public class ReportStatServiceImpl implements ReportStatService {
                 String resourceName = imsi.getString("resourceName");
                 String deviceNames = imsi.getString("deviceName");
                 JSONObject option = imsi.getJSONObject("option");
-//                JSONArray gridData = imsi.getJSONArray("seriesData");
+                JSONArray gridData = imsi.getJSONArray("seriesData");
                 
                 JSONObject xAxis = option.getJSONObject("xAxis");
                 JSONArray series = option.getJSONArray("series");
@@ -244,8 +246,10 @@ public class ReportStatServiceImpl implements ReportStatService {
                 String[] categoryArray = null;
                 
                 if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
-                   resourceName.equals("CPU Run Queue")         ||resourceName.equals("CPU Core") || 
-                   resourceName.equals("Load Avg")) {
+                   resourceName.equals("CPU Run Queue")         || resourceName.equals("CPU Core") || 
+                   resourceName.equals("Load Avg")              || resourceName.equals("Disk Total Used (%)") ||
+                   resourceName.equals("Disk Total Used Bytes")) {
+                    System.out.println("차트 데이터");
                     JSONObject seriesData = (JSONObject) series.get(0);
                     JSONArray seriesList = seriesData.getJSONArray("data");
                    
@@ -254,7 +258,7 @@ public class ReportStatServiceImpl implements ReportStatService {
                     categoryArray = new String[categoriesList.length()];
                     seriesArray = new Integer[seriesList.length()];
                     
-                    for(int a=0; a < categoriesList.length(); a++) {
+                    for(int a=0; a < seriesList.length(); a++) {
                         categoryArray[a] = categoriesList.optString(a);
                         seriesArray[a] = seriesList.optInt(a);
                         
@@ -274,13 +278,10 @@ public class ReportStatServiceImpl implements ReportStatService {
                         
                         categoryArray = new String[categoriesList.length()];
                         partitionDataAry = new Integer[seriesList.length()];
-                        System.out.println(seriesData);
                         
-                        for(int a=0; a < categoriesList.length(); a++) {
+                        for(int a=0; a < seriesList.length(); a++) {
                             categoryArray[a] = categoriesList.optString(a);
-                            System.out.println(categoryArray[a]);
                             partitionDataAry[a] = seriesList.optInt(a);
-                            System.out.println(partitionDataAry[a]);
                             
                             Date dates = outFormat.parse(categoryArray[a]);
                             SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
@@ -316,41 +317,64 @@ public class ReportStatServiceImpl implements ReportStatService {
                 Image chartImage = Image.getInstance(Template_Chart_Holder);
                 doc.add(chartImage);
                 
-//                JSONArray gridDataAryLength = (JSONArray) gridData.get(0);
-//                PdfPTable table = new PdfPTable(gridDataAryLength.length()); 
-//                if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
-//                        resourceName.equals("CPU Run Queue")         ||resourceName.equals("CPU Core") || 
-//                        resourceName.equals("Load Avg")) {
-//                    table.setWidthPercentage(95);
-//                    
-//                    Font gridFont1 = new Font(bFont,10, Font.NORMAL);
-//                    PdfPCell c1 = new PdfPCell(new Phrase(gridDataAryLength.get(0).toString(),gridFont1));
-//                    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-//                    c1.setBackgroundColor(Color.LIGHT_GRAY);
-//                    table.addCell(c1);
-//                    c1 = new PdfPCell(new Phrase(gridDataAryLength.get(1).toString(),gridFont1));
-//                    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-//                    c1.setBackgroundColor(Color.LIGHT_GRAY);
-//                    table.addCell(c1);
-//                    
-//                    for(int q=0; q< gridData.length(); q++) {
-//                        JSONArray gridDataAry = (JSONArray) gridData.get(q);
-//                        for(int b=0; b<gridDataAry.length(); b++) {
-//                            if(q != 0 ) {
-//                                Font gridFont1_1 = new Font(bFont,9, Font.NORMAL);
-//                                PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
-//                                c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
-//                                c1_1.setFixedHeight(15f);
-//                                table.addCell(c1_1);
-//                            }
-//                            
-//                        }
-//                    }
-//                } 
-                  
-               
-                
-//                doc.add(table);
+                if(gridData.length() != 0) {
+                    JSONArray gridDataAryLength = (JSONArray) gridData.get(0);
+                    PdfPTable table = new PdfPTable(gridDataAryLength.length()); 
+                    table.setWidthPercentage(95);
+                    Font gridFont = new Font(bFont,9, Font.NORMAL);
+                    // Grid Label
+                    for(int r=0; r<gridDataAryLength.length(); r++) {
+                        PdfPCell c1 = new PdfPCell(new Phrase(gridDataAryLength.get(r).toString(),gridFont));
+                        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c1.setBackgroundColor(Color.LIGHT_GRAY);
+                        c1.setFixedHeight(20f);
+                        c1.setPadding(4f);
+                        table.addCell(c1);
+                    }
+                    if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
+                            resourceName.equals("CPU Run Queue")    || resourceName.equals("CPU Core") || 
+                            resourceName.equals("Load Avg")) {
+                        for(int q=0; q< gridData.length(); q++) {
+                            JSONArray gridDataAry = (JSONArray) gridData.get(q);
+                            for(int b=0; b<gridDataAry.length(); b++) {
+                                if(q != 0 ) {
+                                    Font gridFont1_1 = new Font(bFont,8, Font.NORMAL);
+                                    PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
+                                    c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                                    c1_1.setFixedHeight(20f);
+                                    table.addCell(c1_1);
+                                }
+                            }
+                        }
+                    } else if(resourceName.equals("Network Traffic")    || resourceName.equals("Network PPS") ||
+                              resourceName.equals("NIC Discards")       || resourceName.equals("NIC Errors")  || 
+                              resourceName.equals("Disk Total Used (%)")|| resourceName.equals("Disk Total Used Bytes")  ) {
+                        for(int q=0; q< gridData.length(); q++) {
+                            JSONArray gridDataAry = (JSONArray) gridData.get(q);
+                            for(int b=0; b<gridDataAry.length(); b++) {
+                                if(q != 0 ) {
+                                    Font gridFont1_1 = new Font(bFont,8, Font.NORMAL);
+                                    PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
+                                    c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                                    c1_1.setFixedHeight(18f);
+                                    c1_1.setPadding(4f);
+                                    if(q == gridData.length() - 3) {
+                                        Color myColor = WebColors.getRGBColor("#FFE5E5");
+                                        c1_1.setBackgroundColor(myColor);
+                                    } else if(q == gridData.length() - 2) {
+                                        Color myColor = WebColors.getRGBColor("#E7F8FF");
+                                        c1_1.setBackgroundColor(myColor);
+                                    } else if(q == gridData.length() - 1) {
+                                        Color myColor = WebColors.getRGBColor("#EDFFEF");
+                                        c1_1.setBackgroundColor(myColor);
+                                    }
+                                    table.addCell(c1_1);
+                                }
+                            }
+                        }
+                    }
+                    doc.add(table);
+                }
             }
             doc.close();
         } catch (Exception e) {
