@@ -348,6 +348,21 @@ public class HistoryUtils {
         historyRecord.setWorkDate(date);
         historyRecordRepository.save(historyRecord);
     }
+    
+    public static void pdfDownloadReportHistory(String pdfName) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        HistoryRecord historyRecord = new HistoryRecord();
+        historyRecord.setUserName(auth.getName());
+        historyRecord.setActionType(Constants.STATUS_DOWNLOAD_STRING);
+        historyRecord.setMenuDepth1(Constants.STATUS_DEPTH_PDF_REPORT);
+        historyRecord.setMenuDepth2(Constants.STATUS_DEPTH_PDF_DOWNLOAD_REPORT);
+        historyRecord.setTargetName(pdfName);
+        historyRecord.setSettingIp(getHostIp());
+        historyRecord.setPageUrl(request.getHeader("referers"));
+        LocalDateTime date = LocalDateTime.now().withNano(0);
+        historyRecord.setWorkDate(date);
+        historyRecordRepository.save(historyRecord);
+    }
 
 
     

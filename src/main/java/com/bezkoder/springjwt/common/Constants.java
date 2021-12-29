@@ -44,4 +44,22 @@ public class Constants {
     public final static String STATUS_DEPTH_DOWNLOAD ="내보내기";
     public final static String STATUS_DEPTH_UPLOADCREATE ="장비 일괄 등록";
     
+    public final static String STATUS_DEPTH_PDF_REPORT ="보고서";
+    public final static String STATUS_DEPTH_PDF_DOWNLOAD_REPORT ="PDF";
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

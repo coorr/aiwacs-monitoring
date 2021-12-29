@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.print.Doc;
+
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.hibernate.internal.build.AllowSysOut;
 import org.jfree.chart.ChartFactory;
@@ -24,6 +27,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
@@ -40,6 +44,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.StatDisk;
 import com.bezkoder.springjwt.models.StatDiskTot;
 import com.bezkoder.springjwt.models.StatNetwork;
@@ -169,6 +174,7 @@ public class ReportStatServiceImpl implements ReportStatService {
          return resultList;
     }
 
+    @Transactional
     @Override
     public ByteArrayInputStream getReportDownloadPdf(String chartData) throws IOException, ParseException {
         System.out.println(chartData);
@@ -189,14 +195,8 @@ public class ReportStatServiceImpl implements ReportStatService {
         String stringStartDate = startDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String stringEndDate = endDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String device = jObject.getString("device");
-        String[] deviceArray = device.split("\\|");
-        device = device.replace("|"," , ");
-        
         JSONArray iObject = jObject.getJSONArray("chart");
-        JSONObject zObject = new JSONObject(iObject.get(0));
-        
-        
-        
+       
         
         try {
             BaseFont bFont = BaseFont.createFont(fontname,BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
@@ -229,7 +229,6 @@ public class ReportStatServiceImpl implements ReportStatService {
             float height = 280;  // 842
             
             
-            System.out.println(iObject.length());
             for(int z=0; z< iObject.length(); z++) {
                 DefaultCategoryDataset mychartData=new DefaultCategoryDataset();
                 JSONObject imsi = (JSONObject) iObject.get(z);
@@ -245,22 +244,28 @@ public class ReportStatServiceImpl implements ReportStatService {
                 System.out.println(resourceName);
                 String[] categoryArray = null;
                 
+                // Chart
                 if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
                    resourceName.equals("CPU Run Queue")         || resourceName.equals("CPU Core") || 
                    resourceName.equals("Load Avg")              || resourceName.equals("Disk Total Used (%)") ||
-                   resourceName.equals("Disk Total Used Bytes")) {
-                    System.out.println("차트 데이터");
+                   resourceName.equals("Disk Total Used Bytes") || resourceName.equals("Memory Used (%)") ||
+                   resourceName.equals("Memory Bytes")          || resourceName.equals("Memory Buffers (%)") ||
+                   resourceName.equals("Memory Buffers Bytes")  || resourceName.equals("Memory Cached (%)") ||
+                   resourceName.equals("Memory Cached Bytes")   || resourceName.equals("Memory Shared (%)")  ||
+                   resourceName.equals("Memory Shared Bytes")   || resourceName.equals("Memory Swap (%)") ||
+                   resourceName.equals("Memory Swap Bytes")     || resourceName.equals("Memory Pagefault")   ) {
+                    
                     JSONObject seriesData = (JSONObject) series.get(0);
                     JSONArray seriesList = seriesData.getJSONArray("data");
                    
-                    Integer[] seriesArray = null;
-                    
+                    BigInteger[] seriesArray = null;
                     categoryArray = new String[categoriesList.length()];
-                    seriesArray = new Integer[seriesList.length()];
+                    seriesArray = new BigInteger[seriesList.length()];
                     
                     for(int a=0; a < seriesList.length(); a++) {
                         categoryArray[a] = categoriesList.optString(a);
-                        seriesArray[a] = seriesList.optInt(a);
+                        seriesArray[a] = seriesList.optBigInteger(a, null);
+                        
                         
                         Date dates = outFormat.parse(categoryArray[a]);
                         SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
@@ -268,8 +273,11 @@ public class ReportStatServiceImpl implements ReportStatService {
                         mychartData.setValue(seriesArray[a], deviceNames  ,categoryArray[a]);  // Comparable 형태를 맞추기 위해 String[] 변환
                     } 
                 } else if(resourceName.equals("Network Traffic")     || resourceName.equals("Network PPS") ||
-                          resourceName.equals("NIC Discards")        || resourceName.equals("NIC Errors")) {
-                    Integer[] partitionDataAry =  null;
+                          resourceName.equals("NIC Discards")        || resourceName.equals("NIC Errors") ||
+                          resourceName.equals("Disk Used (%)")       || resourceName.equals("Disk Used Bytes") ||
+                          resourceName.equals("Disk I/O (%)")        || resourceName.equals("Disk I/O Count") ||
+                          resourceName.equals("Disk I/O Bytes")      || resourceName.equals("Disk Queue")  ) {
+                    BigInteger[] partitionDataAry =  null;
                     
                     for(int w=0; w<series.length(); w++) {
                         JSONObject seriesData = (JSONObject) series.get(w);
@@ -277,11 +285,11 @@ public class ReportStatServiceImpl implements ReportStatService {
                         String seriesPartition = seriesData.getString("name");
                         
                         categoryArray = new String[categoriesList.length()];
-                        partitionDataAry = new Integer[seriesList.length()];
+                        partitionDataAry = new BigInteger[seriesList.length()];
                         
                         for(int a=0; a < seriesList.length(); a++) {
                             categoryArray[a] = categoriesList.optString(a);
-                            partitionDataAry[a] = seriesList.optInt(a);
+                            partitionDataAry[a] = seriesList.optBigInteger(a,null);
                             
                             Date dates = outFormat.parse(categoryArray[a]);
                             SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
@@ -309,20 +317,26 @@ public class ReportStatServiceImpl implements ReportStatService {
                 CategoryPlot plot = chart.getCategoryPlot();
                 plot.getDomainAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
                 plot.getRangeAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
+                ValueAxis axis2 = plot.getRangeAxis();
+                axis2.setTickLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 8)); // y축 폰트
+                
                 
                 Rectangle2D Chart_Region = new Rectangle2D.Double(10, 10, width, height); // margin(x,y) , size(w,h)
                 chart.draw(Graphics_Chart, Chart_Region);  
                 
                 Graphics_Chart.dispose();
                 Image chartImage = Image.getInstance(Template_Chart_Holder);
-                doc.add(chartImage);
-                
+                if(!resourceName.equals("CPU Used (%)")) {
+                    doc.add(chartImage);
+                }
+                writer.setStrictImageSequence(true);
+                // Table
                 if(gridData.length() != 0) {
                     JSONArray gridDataAryLength = (JSONArray) gridData.get(0);
                     PdfPTable table = new PdfPTable(gridDataAryLength.length()); 
                     table.setWidthPercentage(95);
                     Font gridFont = new Font(bFont,9, Font.NORMAL);
-                    // Grid Label
+                    
                     for(int r=0; r<gridDataAryLength.length(); r++) {
                         PdfPCell c1 = new PdfPCell(new Phrase(gridDataAryLength.get(r).toString(),gridFont));
                         c1.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -331,45 +345,27 @@ public class ReportStatServiceImpl implements ReportStatService {
                         c1.setPadding(4f);
                         table.addCell(c1);
                     }
-                    if(resourceName.equals("CPU Processor (%)")     || resourceName.equals("CPU Context Switch") ||
-                            resourceName.equals("CPU Run Queue")    || resourceName.equals("CPU Core") || 
-                            resourceName.equals("Load Avg")) {
-                        for(int q=0; q< gridData.length(); q++) {
-                            JSONArray gridDataAry = (JSONArray) gridData.get(q);
-                            for(int b=0; b<gridDataAry.length(); b++) {
-                                if(q != 0 ) {
-                                    Font gridFont1_1 = new Font(bFont,8, Font.NORMAL);
-                                    PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
-                                    c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                                    c1_1.setFixedHeight(20f);
-                                    table.addCell(c1_1);
+                    
+                    for(int q=0; q< gridData.length(); q++) {
+                        JSONArray gridDataAry = (JSONArray) gridData.get(q);
+                        for(int b=0; b<gridDataAry.length(); b++) {
+                            if(q != 0 ) {
+                                Font gridFont1_1 = new Font(bFont,8, Font.NORMAL);
+                                PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
+                                c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                                c1_1.setFixedHeight(18f);
+                                c1_1.setPadding(4f);
+                                if(q == gridData.length() - 3) {
+                                    Color myColor = WebColors.getRGBColor("#FFE5E5");
+                                    c1_1.setBackgroundColor(myColor);
+                                } else if(q == gridData.length() - 2) {
+                                    Color myColor = WebColors.getRGBColor("#E7F8FF");
+                                    c1_1.setBackgroundColor(myColor);
+                                } else if(q == gridData.length() - 1) {
+                                    Color myColor = WebColors.getRGBColor("#EDFFEF");
+                                    c1_1.setBackgroundColor(myColor);
                                 }
-                            }
-                        }
-                    } else if(resourceName.equals("Network Traffic")    || resourceName.equals("Network PPS") ||
-                              resourceName.equals("NIC Discards")       || resourceName.equals("NIC Errors")  || 
-                              resourceName.equals("Disk Total Used (%)")|| resourceName.equals("Disk Total Used Bytes")  ) {
-                        for(int q=0; q< gridData.length(); q++) {
-                            JSONArray gridDataAry = (JSONArray) gridData.get(q);
-                            for(int b=0; b<gridDataAry.length(); b++) {
-                                if(q != 0 ) {
-                                    Font gridFont1_1 = new Font(bFont,8, Font.NORMAL);
-                                    PdfPCell c1_1 = new PdfPCell(new Phrase(gridDataAry.get(b).toString(),gridFont1_1));
-                                    c1_1.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                                    c1_1.setFixedHeight(18f);
-                                    c1_1.setPadding(4f);
-                                    if(q == gridData.length() - 3) {
-                                        Color myColor = WebColors.getRGBColor("#FFE5E5");
-                                        c1_1.setBackgroundColor(myColor);
-                                    } else if(q == gridData.length() - 2) {
-                                        Color myColor = WebColors.getRGBColor("#E7F8FF");
-                                        c1_1.setBackgroundColor(myColor);
-                                    } else if(q == gridData.length() - 1) {
-                                        Color myColor = WebColors.getRGBColor("#EDFFEF");
-                                        c1_1.setBackgroundColor(myColor);
-                                    }
-                                    table.addCell(c1_1);
-                                }
+                                table.addCell(c1_1);
                             }
                         }
                     }
@@ -380,20 +376,26 @@ public class ReportStatServiceImpl implements ReportStatService {
         } catch (Exception e) {
             System.out.println(e);
         } 
+        HistoryUtils.pdfDownloadReportHistory("AiWACS_Report.pdf");
         return new ByteArrayInputStream(out.toByteArray());
     }
-    private JFreeChart getBarChart() {
-        DefaultCategoryDataset  dataset = new DefaultCategoryDataset();
-        
-        JFreeChart chart = null;
-        String title = "장바구니 통계";
-        try {
-            chart = ChartFactory.createLineChart(title, "상품명", "금액", dataset,  PlotOrientation.VERTICAL, false, false, false);
-        } catch (Exception e) {
-        }
-        return chart;
-    }
+   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
