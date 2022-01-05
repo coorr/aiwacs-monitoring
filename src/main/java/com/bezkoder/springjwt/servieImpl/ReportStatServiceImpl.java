@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -195,6 +196,8 @@ public class ReportStatServiceImpl implements ReportStatService {
         String stringStartDate = startDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String stringEndDate = endDateTimeChange.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String device = jObject.getString("device");
+        String[] deviceArray = device.split("\\|");
+        device = device.replace("|"," , ");
         JSONArray iObject = jObject.getJSONArray("chart");
        
         
@@ -258,14 +261,13 @@ public class ReportStatServiceImpl implements ReportStatService {
                     JSONObject seriesData = (JSONObject) series.get(0);
                     JSONArray seriesList = seriesData.getJSONArray("data");
                    
-                    BigInteger[] seriesArray = null;
+                    BigDecimal[] seriesArray = null;
                     categoryArray = new String[categoriesList.length()];
-                    seriesArray = new BigInteger[seriesList.length()];
+                    seriesArray = new BigDecimal[seriesList.length()];
                     
                     for(int a=0; a < seriesList.length(); a++) {
                         categoryArray[a] = categoriesList.optString(a);
-                        seriesArray[a] = seriesList.optBigInteger(a, null);
-                        
+                        seriesArray[a] = seriesList.optBigDecimal(a, null);
                         
                         Date dates = outFormat.parse(categoryArray[a]);
                         SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
@@ -277,7 +279,7 @@ public class ReportStatServiceImpl implements ReportStatService {
                           resourceName.equals("Disk Used (%)")       || resourceName.equals("Disk Used Bytes") ||
                           resourceName.equals("Disk I/O (%)")        || resourceName.equals("Disk I/O Count") ||
                           resourceName.equals("Disk I/O Bytes")      || resourceName.equals("Disk Queue")  ) {
-                    BigInteger[] partitionDataAry =  null;
+                    BigDecimal[] partitionDataAry =  null;
                     
                     for(int w=0; w<series.length(); w++) {
                         JSONObject seriesData = (JSONObject) series.get(w);
@@ -285,11 +287,11 @@ public class ReportStatServiceImpl implements ReportStatService {
                         String seriesPartition = seriesData.getString("name");
                         
                         categoryArray = new String[categoriesList.length()];
-                        partitionDataAry = new BigInteger[seriesList.length()];
+                        partitionDataAry = new BigDecimal[seriesList.length()];
                         
                         for(int a=0; a < seriesList.length(); a++) {
                             categoryArray[a] = categoriesList.optString(a);
-                            partitionDataAry[a] = seriesList.optBigInteger(a,null);
+                            partitionDataAry[a] = seriesList.optBigDecimal(a,null);
                             
                             Date dates = outFormat.parse(categoryArray[a]);
                             SimpleDateFormat cateDateFormat = new SimpleDateFormat("MM-dd HH:mm");
@@ -304,24 +306,25 @@ public class ReportStatServiceImpl implements ReportStatService {
                 chart.getTitle().setHorizontalAlignment(HorizontalAlignment.LEFT);
                 chart.getTitle().setFont(new java.awt.Font(resourceName, java.awt.Font.BOLD, 12));
                 chart.getPlot().setBackgroundPaint(new Color(236,236,236));
-                chart.getLegend().setItemFont(new java.awt.Font("돋움", java.awt.Font.PLAIN, 10));  // legend 한글 아직 안먹음
+                chart.getLegend().setItemFont(new java.awt.Font("돋움", java.awt.Font.PLAIN, 10)); 
                 chart.getLegend().setFrame(BlockBorder.NONE);
 
-                PdfContentByte Add_Chart_Content = writer.getDirectContent();  // 차트 내용 선언
-                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(595, 300);  // 차트 크기설정(700,950)
-                Graphics2D Graphics_Chart = Template_Chart_Holder.createGraphics(595, 300, new DefaultFontMapper()); // 차트 x,y 조절
+                PdfContentByte Add_Chart_Content = writer.getDirectContent();  
+                PdfTemplate Template_Chart_Holder = Add_Chart_Content.createTemplate(595, 300);  
+                Graphics2D Graphics_Chart = Template_Chart_Holder.createGraphics(595, 300, new DefaultFontMapper()); 
                 
                 CategoryAxis domainAxis = chart.getCategoryPlot().getDomainAxis();
                 domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.0));
                 domainAxis.setTickLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 10));
+                
                 CategoryPlot plot = chart.getCategoryPlot();
                 plot.getDomainAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
                 plot.getRangeAxis().setLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 5));
                 ValueAxis axis2 = plot.getRangeAxis();
-                axis2.setTickLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 8)); // y축 폰트
+                axis2.setTickLabelFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 8)); 
                 
                 
-                Rectangle2D Chart_Region = new Rectangle2D.Double(10, 10, width, height); // margin(x,y) , size(w,h)
+                Rectangle2D Chart_Region = new Rectangle2D.Double(10, 10, width, height); 
                 chart.draw(Graphics_Chart, Chart_Region);  
                 
                 Graphics_Chart.dispose();
