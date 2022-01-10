@@ -48,20 +48,11 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             
             JSONObject obj = (JSONObject) nodeDataArray.get(i);   
             System.out.println((JSONObject) nodeDataArray.get(i));
-            //equipment: "테스트"
-//            id: 1
-//            loc: "0 0"
-//            settingIp: "10.10.10.80"
-            if(obj.getString("equipment") != null && obj.get("loc") != null && obj.get("settingIp") != null) {
-                tNode.setEquipment(obj.getString("equipment"));
-                System.out.println("asdasdasdasd");
-                System.out.println(obj.getInt("id"));
                 tNode.setId(obj.getInt("id"));
-//                tNode.setId((Integer) obj.get("id"));
-                tNode.setLoc((String) obj.get("loc"));
-                tNode.setSettingIp((String) obj.get("settingIp"));
+                tNode.setEquipment(obj.getString("equipment"));
+                tNode.setLoc(obj.getString("loc"));
+                tNode.setSettingIp(obj.getString("settingIp"));
                 topologyNodeRepository.saveAndFlush(tNode);
-            }
             
         }
         

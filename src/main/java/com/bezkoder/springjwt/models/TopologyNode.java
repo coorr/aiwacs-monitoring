@@ -20,8 +20,8 @@ import lombok.Setter;
 public class TopologyNode {
     
         @Id
-        @SequenceGenerator(name="topology_node_seq", sequenceName="topology_node_seq", allocationSize=1)
-        @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="stat_network_seq")
+//        @SequenceGenerator(initialValue = 1,name="topology_node_seqs", sequenceName="topology_node_seqs", allocationSize=1)
+//        @GeneratedValue(generator="stat_network_seqs")
         @Column(name = "node_id")
         private Integer id;
 

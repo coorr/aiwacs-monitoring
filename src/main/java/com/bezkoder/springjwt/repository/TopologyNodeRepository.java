@@ -17,10 +17,10 @@ public interface TopologyNodeRepository  extends JpaRepository<TopologyNode, Int
     @Query("select t from TopologyNode t order by t.id asc")
     List<TopologyNode> getTopologyNode();
     
-//    @Modifying(clearAutomatically=true)
-//    @Query(value = "insert into from topology_node(equipment, loc, setting_ip) values   " , nativeQuery = true)
-//    List<TopologyNode> insertTopologyNode();
-//
+    @Modifying(clearAutomatically=true)
+    @Query(value = "insert into topology_node(node_id,equipment,loc,setting_ip) values (:id,:equipment,:loc,:settingIp)" , nativeQuery = true)
+    void insertTopologyNode(Integer id, String equipment,String loc, String settingIp);
+
 //    @Modifying(clearAutomatically=true)
 //    @Query(value="insert into group_equipment_join(group_id, equipment_id) values (:parentKey, :deviceKeys)", nativeQuery = true)
 //    void insertDeviceMapping(@Param("parentKey") Integer parentKey,@Param("deviceKeys") int[] deviceKeys);

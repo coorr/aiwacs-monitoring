@@ -25,9 +25,9 @@ public class TopologyLink {
         @Column(name = "Link_id")
         private Integer id;
         
-//        @Column(name="froms")
-//        private Integer from;  
-//        @Column(name="to")
-//        private Integer tos;
-//        private Integer borderColor;
+        private Integer froms;  
+        private Integer tos;
+        private Integer borderColor;
+        
+        
 }
