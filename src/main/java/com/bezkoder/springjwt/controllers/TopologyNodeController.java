@@ -3,6 +3,7 @@ package com.bezkoder.springjwt.controllers;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,7 +31,7 @@ public class TopologyNodeController {
     private final TopologyNodeService topologyNodeService;
 
     @GetMapping("/topology/getTopologyNode")
-    public List<TopologyNode> getTopologyNode()  {
+    public Map<String, Object> getTopologyNode()  {
         return topologyNodeService.getTopologyNode();
     }
     
