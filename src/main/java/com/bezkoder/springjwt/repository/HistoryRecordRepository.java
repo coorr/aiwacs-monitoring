@@ -21,6 +21,9 @@ public interface HistoryRecordRepository extends JpaRepository<HistoryRecord, Lo
     @Query("select h from HistoryRecord h order by h.id desc")
     List<HistoryRecord> getHistoryRecord();
     
+//    @Query(value= "select * from history_record  order by record_id asc limit 30", nativeQuery=true)
+//    List<HistoryRecord> getHistoryRecord();
+    
     @Query("select h from HistoryRecord h")
     List<HistoryRecord> getHistoryRecordExcel();
     

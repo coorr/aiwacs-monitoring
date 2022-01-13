@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bezkoder.springjwt.models.DiagramGroup;
 import com.bezkoder.springjwt.models.Group;
 import com.bezkoder.springjwt.models.TopologyNode;
 import com.bezkoder.springjwt.service.GroupService;
@@ -38,5 +39,15 @@ public class TopologyNodeController {
     @PostMapping("/topology/insertTopologyNode")
     public void insertTopologyNode(@RequestBody String topologyNode)  {
         topologyNodeService.insertTopologyNode(topologyNode);
+    }
+    
+    @GetMapping("/topology/getDiagramGroup")
+    public List<DiagramGroup> getDiagramGroup()  {
+        return topologyNodeService.getDiagramGroup();
+    }
+    
+    @PostMapping("/topology/insertDiagramGroup")
+    public List<DiagramGroup> insertDiagramGroup(@RequestBody String diagramGroup)  {
+        return topologyNodeService.insertDiagramGroup(diagramGroup);
     }
 }

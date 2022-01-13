@@ -14,10 +14,12 @@ import com.bezkoder.springjwt.models.TopologyNode;
 public interface TopologyLinkRepository extends JpaRepository<TopologyLink, Integer> {
 
     
-    @Query("select t from TopologyLink t order by t.id asc")
+    @Query("select l from TopologyLink l order by l.id asc")
     List<TopologyLink> getTopologyLink();
     
-    
+    @Modifying(clearAutomatically=true)
+    @Query("delete from TopologyLink l where l.id = ?1 ")
+    Integer deleteTopogolyLink(int id);
 //    
 //    @Modifying(clearAutomatically=true)
 //    @Query(value = "insert into topology_node(node_id,equipment,loc,setting_ip) values (:id,:equipment,:loc,:settingIp)" , nativeQuery = true)

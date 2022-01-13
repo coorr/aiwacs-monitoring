@@ -20,8 +20,8 @@ import lombok.Setter;
 public class TopologyLink {
     
         @Id
-        @SequenceGenerator(name="topology_Link_seq", sequenceName="topology_Link_seq", allocationSize=1)
-        @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="topology_Link_seq")
+//        @SequenceGenerator(name="topology_Link_seq", sequenceName="topology_Link_seq", allocationSize=1)
+//        @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="topology_Link_seq")
         @Column(name = "Link_id")
         private Integer id;
         

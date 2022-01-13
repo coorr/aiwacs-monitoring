@@ -1,17 +1,25 @@
 package com.bezkoder.springjwt.servieImpl;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bezkoder.springjwt.models.DiagramGroup;
 import com.bezkoder.springjwt.models.TopologyLink;
 import com.bezkoder.springjwt.models.TopologyNode;
+import com.bezkoder.springjwt.repository.DiagramGroupRepository;
 import com.bezkoder.springjwt.repository.TopologyLinkRepository;
 import com.bezkoder.springjwt.repository.TopologyNodeRepository;
 import com.bezkoder.springjwt.service.TopologyNodeService;
@@ -27,6 +35,7 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     
     private final TopologyNodeRepository topologyNodeRepository;
     private final TopologyLinkRepository topologyLinkRepository;
+    private final DiagramGroupRepository diagramGroupRepository;
     
     @Override
     public Map<String, Object> getTopologyNode() {
@@ -46,13 +55,8 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     public void insertTopologyNode(String topologyNode) {
         JSONObject jObject = new JSONObject(topologyNode);
         
-        System.out.println(jObject.getJSONArray("nodeDataArray"));
         JSONArray nodeDataArray = jObject.getJSONArray("nodeDataArray");
-        System.out.println(nodeDataArray.length());
-        JSONObject nodeDataIndex = (JSONObject) nodeDataArray.get(0);
-        String equipment = nodeDataIndex.getString("equipment");
-        System.out.println(equipment);
-        
+        JSONArray linkDataArray = jObject.getJSONArray("linkDataArray");
         
         List<TopologyNode> topologyNodes = topologyNodeRepository.getTopologyNode();
         List<Number> keyNode = new ArrayList<Number>();
@@ -62,7 +66,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             TopologyNode tNode = new TopologyNode();
             
             JSONObject obj = (JSONObject) nodeDataArray.get(i);   
-            System.out.println((JSONObject) nodeDataArray.get(i));
             tNode.setId(obj.getInt("id"));
             tNode.setEquipment(obj.getString("equipment"));
             tNode.setLoc(obj.getString("loc"));
@@ -80,6 +83,31 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             }
         }
         
+        List<TopologyLink> topologyLinks = topologyLinkRepository.getTopologyLink();
+        List<Number> keyLink = new ArrayList<Number>();
+        
+        // 링크 추가
+        for(int k=0; k< linkDataArray.length(); k++) {
+            TopologyLink tLink = new TopologyLink();
+            
+            JSONObject obj = (JSONObject) linkDataArray.get(k);   
+            tLink.setId(obj.getInt("id"));
+            tLink.setFroms(obj.getInt("froms"));
+            tLink.setTos(obj.getInt("tos"));
+            tLink.setBorderColor(1);
+            topologyLinkRepository.saveAndFlush(tLink);
+            
+            keyLink.add(obj.getInt("id"));
+        }
+        
+        // 링크 삭제
+        for(int n=0; n< topologyLinks.size(); n++) {
+            TopologyLink linkDeleteKey = topologyLinks.get(n);
+            if(!keyLink.contains(linkDeleteKey.getId())) {
+                topologyLinkRepository.deleteTopogolyLink(linkDeleteKey.getId());
+            }
+        }
+        
         
         
         
@@ -88,15 +116,41 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         
         
 
-//        ObjectMapper mapper = new ObjectMapper();
-//        try {
-//            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(topologyNode);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(linkDataArray);
 //            String json2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(test);
-//            System.out.println(json2);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
+            System.out.println(json);
+        } catch (JsonProcessingException e) {}
         
+    }
+
+    @Transactional
+    @Override
+    public List<DiagramGroup> insertDiagramGroup(String diagramGroup) {
+        System.out.println(diagramGroup);
+        JSONObject obj = new JSONObject(diagramGroup);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
+        
+        
+        System.out.println(auth.getName());
+        DiagramGroup dGroup = new DiagramGroup();
+        dGroup.setGroupName(obj.getString("groupName"));
+        dGroup.setContent(obj.getString("content"));
+        dGroup.setStartCreatedName(auth.getName());
+        dGroup.setCreatedAt(date);  
+        diagramGroupRepository.save(dGroup);
+        
+       
+        
+        return diagramGroupRepository.getDiagramGroup();
+   
+    }
+
+    @Override
+    public List<DiagramGroup> getDiagramGroup() {
+        return diagramGroupRepository.getDiagramGroup();
     }
 
 }

@@ -1,6 +1,5 @@
 package com.bezkoder.springjwt.models;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -48,7 +47,7 @@ public class Equipment {
 	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinTable(    name = "group_equipment_join", 
+	@JoinTable(name = "group_equipment_join", 
     joinColumns = @JoinColumn(name = "equipment_id"),  
     inverseJoinColumns = @JoinColumn(name = "group_id"))
 	private Group group;
