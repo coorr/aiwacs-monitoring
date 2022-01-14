@@ -5,8 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.springframework.data.jpa.repository.Modifying;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,4 +32,8 @@ public class TopologyNode {
         private String equipment;  
         private String loc;
         private String settingIp;
+        
+        @ManyToOne
+        @JoinColumn(name = "diagram_id")
+        private DiagramGroup diagramId;
 }

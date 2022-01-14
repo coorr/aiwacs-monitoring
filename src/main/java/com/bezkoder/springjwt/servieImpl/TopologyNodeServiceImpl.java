@@ -16,7 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.DiagramGroup;
+import com.bezkoder.springjwt.models.Equipment;
 import com.bezkoder.springjwt.models.TopologyLink;
 import com.bezkoder.springjwt.models.TopologyNode;
 import com.bezkoder.springjwt.repository.DiagramGroupRepository;
@@ -107,14 +109,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
                 topologyLinkRepository.deleteTopogolyLink(linkDeleteKey.getId());
             }
         }
-        
-        
-        
-        
-        
-        
-        
-        
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -142,14 +136,25 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         dGroup.setCreatedAt(date);  
         diagramGroupRepository.save(dGroup);
         
-       
-        
         return diagramGroupRepository.getDiagramGroup();
    
     }
 
     @Override
     public List<DiagramGroup> getDiagramGroup() {
+        return diagramGroupRepository.getDiagramGroup();
+    }
+
+    @Transactional
+    @Override
+    public List<DiagramGroup> updateDiagramGroup(String diagramGroup) {
+        System.out.println(diagramGroup);
+        
+        JSONObject obj = new JSONObject(diagramGroup);
+        DiagramGroup dGroup = diagramGroupRepository.findOne(obj.getInt("id"));
+        dGroup.setId(obj.getInt("id"));
+        dGroup.setContent(obj.getString("content"));
+        dGroup.setGroupName(obj.getString("groupName"));
         return diagramGroupRepository.getDiagramGroup();
     }
 

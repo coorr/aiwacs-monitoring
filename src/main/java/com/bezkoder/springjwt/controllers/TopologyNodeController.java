@@ -50,4 +50,9 @@ public class TopologyNodeController {
     public List<DiagramGroup> insertDiagramGroup(@RequestBody String diagramGroup)  {
         return topologyNodeService.insertDiagramGroup(diagramGroup);
     }
+    
+    @PostMapping("/topology/updateDiagramGroup")
+    public List<DiagramGroup> updateDiagramGroup(@RequestBody String diagramGroup)  {
+        return topologyNodeService.updateDiagramGroup(diagramGroup);
+    }
 }

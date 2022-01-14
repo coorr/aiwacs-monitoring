@@ -12,5 +12,6 @@ public interface TopologyNodeService {
     public void insertTopologyNode(String topologyNode);
     public List<DiagramGroup> insertDiagramGroup(String diagramGroup);
     public List<DiagramGroup> getDiagramGroup();
+    public List<DiagramGroup> updateDiagramGroup(String diagramGroup);
 
 }
