@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -25,9 +26,12 @@ public class TopologyLink {
         @Column(name = "Link_id")
         private Integer id;
         
-        private Integer froms;  
-        private Integer tos;
+        private String froms;  
+        private String tos;
         private Integer borderColor;
+        
+        @JoinColumn(name = "diagram_id")
+        private Integer diagramId;   
         
         
 }

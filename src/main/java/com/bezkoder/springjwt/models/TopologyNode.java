@@ -2,6 +2,7 @@ package com.bezkoder.springjwt.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -11,6 +12,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.repository.Modifying;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,17 +26,19 @@ import lombok.Setter;
 @Setter
 public class TopologyNode {
     
-        @Id
+//        @Id  
 //        @SequenceGenerator(initialValue = 1,name="topology_node_seqs", sequenceName="topology_node_seqs", allocationSize=1)
 //        @GeneratedValue(generator="stat_network_seqs")
-        @Column(name = "node_id")
-        private Integer id;
-
+        @Id
+        @Column(name = "node_Id")
+        private String id;      
+   
         private String equipment;  
         private String loc;
         private String settingIp;
         
-        @ManyToOne
+//        @ManyToOne(fetch = FetchType.LAZY)
+//        @JsonIgnore
         @JoinColumn(name = "diagram_id")
-        private DiagramGroup diagramId;
+        private Integer diagramId;
 }

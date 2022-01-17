@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.DiagramGroup;
@@ -28,6 +30,7 @@ import com.bezkoder.springjwt.service.TopologyNodeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -40,13 +43,13 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     private final DiagramGroupRepository diagramGroupRepository;
     
     @Override
-    public Map<String, Object> getTopologyNode() {
+    public Map<String, Object> getTopologyNode(Integer diagramId) {
         Map<String, Object> resultList = new HashMap<String, Object>();
         
-        List<TopologyNode> topologyNodes = topologyNodeRepository.getTopologyNode();
+        List<TopologyNode> topologyNodes = topologyNodeRepository.getByNoTopologyNode(diagramId);
         resultList.put("nodeDataArray", topologyNodes);
         
-        List<TopologyLink> topologyLinks = topologyLinkRepository.getTopologyLink();
+        List<TopologyLink> topologyLinks = topologyLinkRepository.getByNoTopologyLink(diagramId);
         resultList.put("linkDataArray", topologyLinks);
         
         return resultList;
@@ -54,27 +57,28 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
 
     @Transactional
     @Override
-    public void insertTopologyNode(String topologyNode) {
+    public void insertTopologyNode(Integer diagramId, String topologyNode) {
         JSONObject jObject = new JSONObject(topologyNode);
         
         JSONArray nodeDataArray = jObject.getJSONArray("nodeDataArray");
         JSONArray linkDataArray = jObject.getJSONArray("linkDataArray");
         
-        List<TopologyNode> topologyNodes = topologyNodeRepository.getTopologyNode();
-        List<Number> keyNode = new ArrayList<Number>();
+        List<TopologyNode> topologyNodes = topologyNodeRepository.getByNoTopologyNode(diagramId);
+        List<String> keyNode = new ArrayList<String>();
         
         // 노드 추가
         for (int i=0;i<nodeDataArray.length();i++) {
             TopologyNode tNode = new TopologyNode();
             
             JSONObject obj = (JSONObject) nodeDataArray.get(i);   
-            tNode.setId(obj.getInt("id"));
+            tNode.setId(obj.getString("id"));
             tNode.setEquipment(obj.getString("equipment"));
             tNode.setLoc(obj.getString("loc"));
             tNode.setSettingIp(obj.getString("settingIp"));
+            tNode.setDiagramId(diagramId);
             topologyNodeRepository.saveAndFlush(tNode);
-            
-            keyNode.add(obj.getInt("id"));
+              
+            keyNode.add(obj.getString("id"));
         }
         
         // 노드 삭제
@@ -85,8 +89,8 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             }
         }
         
-        List<TopologyLink> topologyLinks = topologyLinkRepository.getTopologyLink();
-        List<Number> keyLink = new ArrayList<Number>();
+        List<TopologyLink> topologyLinks = topologyLinkRepository.getByNoTopologyLink(diagramId);
+        List<Integer> keyLink = new ArrayList<Integer>();
         
         // 링크 추가
         for(int k=0; k< linkDataArray.length(); k++) {
@@ -94,8 +98,9 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             
             JSONObject obj = (JSONObject) linkDataArray.get(k);   
             tLink.setId(obj.getInt("id"));
-            tLink.setFroms(obj.getInt("froms"));
-            tLink.setTos(obj.getInt("tos"));
+            tLink.setFroms(obj.getString("froms"));
+            tLink.setTos(obj.getString("tos"));
+            tLink.setDiagramId(diagramId);
             tLink.setBorderColor(1);
             topologyLinkRepository.saveAndFlush(tLink);
             
@@ -109,14 +114,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
                 topologyLinkRepository.deleteTopogolyLink(linkDeleteKey.getId());
             }
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(linkDataArray);
-//            String json2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(test);
-            System.out.println(json);
-        } catch (JsonProcessingException e) {}
-        
     }
 
     @Transactional
@@ -155,6 +152,18 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         dGroup.setId(obj.getInt("id"));
         dGroup.setContent(obj.getString("content"));
         dGroup.setGroupName(obj.getString("groupName"));
+        return diagramGroupRepository.getDiagramGroup();
+    }
+
+    @Transactional
+    @Override
+    public List<DiagramGroup> deleteDiagramGroup(String groupId) {
+        String[] arrayId = groupId.split("\\|");
+        int[] id=Arrays.stream(arrayId).mapToInt(Integer::parseInt).toArray();   
+        diagramGroupRepository.deleteDiagramGroup(id);
+        topologyLinkRepository.deleteAllTopogolyLink(id);
+        topologyNodeRepository.deleteAllTopogolyNode(id);
+        
         return diagramGroupRepository.getDiagramGroup();
     }
 
