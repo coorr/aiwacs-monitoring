@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -58,6 +59,8 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     @Transactional
     @Override
     public void insertTopologyNode(Integer diagramId, String topologyNode) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        LocalDateTime date = LocalDateTime.now().withNano(0);
         JSONObject jObject = new JSONObject(topologyNode);
         
         JSONArray nodeDataArray = jObject.getJSONArray("nodeDataArray");
@@ -114,6 +117,10 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
                 topologyLinkRepository.deleteTopogolyLink(linkDeleteKey.getId());
             }
         }
+        
+        DiagramGroup diagramGroups = diagramGroupRepository.findOne(diagramId);
+        diagramGroups.setEndCreatedName(auth.getName());
+        diagramGroups.setUpdatedAt(date);
     }
 
     @Transactional
