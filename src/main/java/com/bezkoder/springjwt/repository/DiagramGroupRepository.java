@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.bezkoder.springjwt.models.DiagramGroup;
 import com.bezkoder.springjwt.models.Equipment;
+import com.bezkoder.springjwt.models.TopologyImage;
 
 @Repository
 public interface DiagramGroupRepository extends JpaRepository<DiagramGroup, Integer> {
@@ -20,6 +21,9 @@ public interface DiagramGroupRepository extends JpaRepository<DiagramGroup, Inte
     
     @Query("select d from DiagramGroup d where d.id =:id")
     DiagramGroup findOne(Integer id);
+    
+    @Query("select d from DiagramGroup d where d.id = ?1 ")
+    List<DiagramGroup> getByNoDiagramGroup(Integer diagramId);
     
     @Modifying(clearAutomatically=true)
     @Query("delete from DiagramGroup d where d.id in (?1) ")

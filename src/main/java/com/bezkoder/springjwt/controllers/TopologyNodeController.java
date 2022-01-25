@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bezkoder.springjwt.models.DiagramGroup;
 import com.bezkoder.springjwt.models.Group;
@@ -40,8 +43,13 @@ public class TopologyNodeController {
     }
     
     @PostMapping("/topology/insertTopologyNode/{diagramId}")
-    public void insertTopologyNode(@PathVariable("diagramId") Integer diagramId,@RequestBody String topologyNode)  {
+    public void insertTopologyNode(@PathVariable("diagramId") Integer diagramId, @RequestBody String topologyNode)  {
         topologyNodeService.insertTopologyNode(diagramId,topologyNode);
+    }
+    
+    @PostMapping("/topology/diagramInsertImage/{diagramId}")
+    public void diagramInsertImage(@PathVariable("diagramId") Integer diagramId, @RequestParam("file") MultipartFile multipartFile)  {
+        topologyNodeService.diagramInsertImage(diagramId,multipartFile);
     }
     
     @GetMapping("/topology/getDiagramGroup")

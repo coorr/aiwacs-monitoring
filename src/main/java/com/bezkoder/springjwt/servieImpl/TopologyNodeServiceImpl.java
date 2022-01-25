@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.servieImpl;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,13 +20,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.DiagramGroup;
 import com.bezkoder.springjwt.models.Equipment;
+import com.bezkoder.springjwt.models.TopologyImage;
 import com.bezkoder.springjwt.models.TopologyLink;
 import com.bezkoder.springjwt.models.TopologyNode;
 import com.bezkoder.springjwt.repository.DiagramGroupRepository;
+import com.bezkoder.springjwt.repository.TopologyImageRepository;
 import com.bezkoder.springjwt.repository.TopologyLinkRepository;
 import com.bezkoder.springjwt.repository.TopologyNodeRepository;
 import com.bezkoder.springjwt.service.TopologyNodeService;
@@ -42,6 +47,7 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     private final TopologyNodeRepository topologyNodeRepository;
     private final TopologyLinkRepository topologyLinkRepository;
     private final DiagramGroupRepository diagramGroupRepository;
+    private final TopologyImageRepository topologyImageRepository;
     
     @Override
     public Map<String, Object> getTopologyNode(Integer diagramId) {
@@ -52,6 +58,15 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         
         List<TopologyLink> topologyLinks = topologyLinkRepository.getByNoTopologyLink(diagramId);
         resultList.put("linkDataArray", topologyLinks);
+        
+        List<DiagramGroup> diagramGroups = diagramGroupRepository.getByNoDiagramGroup(diagramId);
+        JSONArray dArray = new JSONArray(diagramGroups);
+        JSONObject dObject = dArray.getJSONObject(0);
+//        if(dObject.getString("imageLocation") != und) {
+//            String location =  dObject.getString("imageLocation");
+//            resultList.put("image", location);
+//        }
+        
         
         return resultList;
     }
@@ -122,6 +137,46 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         diagramGroups.setEndCreatedName(auth.getName());
         diagramGroups.setUpdatedAt(date);
     }
+    
+    @Transactional
+    @Override
+    public void diagramInsertImage(Integer diagramId, MultipartFile file) {
+        try {
+            String fileId = (new Date().getTime()) + "" + (new Random().ints(1000, 9999).findAny().getAsInt());
+            String originName = file.getOriginalFilename(); // 파일이름과 확장자
+            String fileExtension = originName.substring(originName.lastIndexOf(".") + 1); // 파일확장자
+            originName = originName.substring(0, originName.lastIndexOf(".")); // 파일이름
+            long fileSize = file.getSize();
+            
+            String absolutePath = new File("").getAbsolutePath() + "\\";
+            String path = "src/main/resources/static/";
+            
+            File fileSave = new File(path); // ex) fileId.jpg
+            if(!fileSave.exists()) {
+                fileSave.mkdirs();
+            }
+            fileSave = new File(absolutePath + path+ "/" +fileId+ "." +fileExtension);
+            file.transferTo(fileSave);
+            
+            System.out.println("fileId= " + fileId);
+            System.out.println("originName= " + originName);
+            System.out.println("fileExtension= " + fileExtension);
+            System.out.println("fileSize= " + fileSize);
+            System.out.println("fileSize=2 " + absolutePath + path+ "/" +fileId+ "." +fileExtension);
+            
+            
+//            TopologyImage tImage = new TopologyImage();
+//            tImage.setDiagramId(diagramId);
+//            tImage.setLocation(fileId+ "." +fileExtension);
+//            topologyImageRepository.save(tImage);
+            DiagramGroup diagramGroups = diagramGroupRepository.findOne(diagramId);
+            diagramGroups.setImageLocation(fileId+ "." +fileExtension);
+            
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        
+    }
 
     @Transactional
     @Override
@@ -173,6 +228,8 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         
         return diagramGroupRepository.getDiagramGroup();
     }
+
+    
 
 }
 

@@ -40,6 +40,7 @@ public class DiagramGroup {
       
       @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
       private LocalDateTime updatedAt;
+      private String imageLocation;
 }
 
 
