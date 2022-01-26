@@ -60,13 +60,13 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         resultList.put("linkDataArray", topologyLinks);
         
         List<DiagramGroup> diagramGroups = diagramGroupRepository.getByNoDiagramGroup(diagramId);
-        JSONArray dArray = new JSONArray(diagramGroups);
-        JSONObject dObject = dArray.getJSONObject(0);
-//        if(dObject.getString("imageLocation") != und) {
-//            String location =  dObject.getString("imageLocation");
-//            resultList.put("image", location);
-//        }
         
+        for(DiagramGroup dGroup : diagramGroups) {
+            System.out.println(dGroup.getImageLocation());
+            if(dGroup.getImageLocation() != null) {
+                resultList.put("image", dGroup.getImageLocation());
+            }
+        }
         
         return resultList;
     }
@@ -93,6 +93,7 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             tNode.setEquipment(obj.getString("equipment"));
             tNode.setLoc(obj.getString("loc"));
             tNode.setSettingIp(obj.getString("settingIp"));
+            tNode.setCategory(obj.getString("category"));
             tNode.setDiagramId(diagramId);
             topologyNodeRepository.saveAndFlush(tNode);
               
@@ -165,10 +166,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             System.out.println("fileSize=2 " + absolutePath + path+ "/" +fileId+ "." +fileExtension);
             
             
-//            TopologyImage tImage = new TopologyImage();
-//            tImage.setDiagramId(diagramId);
-//            tImage.setLocation(fileId+ "." +fileExtension);
-//            topologyImageRepository.save(tImage);
             DiagramGroup diagramGroups = diagramGroupRepository.findOne(diagramId);
             diagramGroups.setImageLocation(fileId+ "." +fileExtension);
             
@@ -176,6 +173,13 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             System.out.println(e);
         }
         
+    }
+    
+    @Transactional
+    @Override
+    public void diagramDeleteImage(Integer diagramId) {
+        DiagramGroup diagramGroups = diagramGroupRepository.findOne(diagramId);
+        diagramGroups.setImageLocation(null);
     }
 
     @Transactional
@@ -228,6 +232,8 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
         
         return diagramGroupRepository.getDiagramGroup();
     }
+
+    
 
     
 

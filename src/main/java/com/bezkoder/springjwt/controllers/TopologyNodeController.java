@@ -52,6 +52,11 @@ public class TopologyNodeController {
         topologyNodeService.diagramInsertImage(diagramId,multipartFile);
     }
     
+    @PostMapping("/topology/diagramDeleteImage/{diagramId}")
+    public void diagramDeleteImage(@PathVariable("diagramId") Integer diagramId)  {
+        topologyNodeService.diagramDeleteImage(diagramId);
+    }
+    
     @GetMapping("/topology/getDiagramGroup")
     public List<DiagramGroup> getDiagramGroup()  {
         return topologyNodeService.getDiagramGroup();

@@ -3,10 +3,12 @@ package com.bezkoder.springjwt.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.NamedQuery;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import com.bezkoder.springjwt.models.DiagramGroup;
@@ -16,13 +18,13 @@ import com.bezkoder.springjwt.models.TopologyImage;
 @Repository
 public interface DiagramGroupRepository extends JpaRepository<DiagramGroup, Integer> {
 
-    @Query("select d from DiagramGroup d order by d.id asc")
+    @Query("select d from DiagramGroup d order by d.updatedAt desc nulls last")
     List<DiagramGroup> getDiagramGroup();
     
     @Query("select d from DiagramGroup d where d.id =:id")
     DiagramGroup findOne(Integer id);
     
-    @Query("select d from DiagramGroup d where d.id = ?1 ")
+    @Query("SELECT a FROM DiagramGroup a WHERE a.id = ?1")
     List<DiagramGroup> getByNoDiagramGroup(Integer diagramId);
     
     @Modifying(clearAutomatically=true)
@@ -32,6 +34,8 @@ public interface DiagramGroupRepository extends JpaRepository<DiagramGroup, Inte
     @Modifying(clearAutomatically=true)
     @Query("update DiagramGroup d set d.endCreatedName = ?1 , d.updatedAt = ?2 where id = ?3 ")
     Integer updateDiagramGroup(String name, LocalDateTime date, Integer id);
+    
+    
     
     
 //    @Modifying(clearAutomatically=true)

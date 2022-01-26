@@ -13,6 +13,7 @@ public interface TopologyNodeService {
     public Map<String, Object> getTopologyNode(Integer diagramId);
     public void insertTopologyNode(Integer diagramId, String topologyNode);
     public void diagramInsertImage(Integer diagramId, MultipartFile multipartFile);
+    public void diagramDeleteImage(Integer diagramId);
     public List<DiagramGroup> insertDiagramGroup(String diagramGroup);
     public List<DiagramGroup> getDiagramGroup();
     public List<DiagramGroup> updateDiagramGroup(String diagramGroup);

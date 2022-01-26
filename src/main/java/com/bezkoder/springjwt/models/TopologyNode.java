@@ -37,8 +37,7 @@ public class TopologyNode {
         private String loc;
         private String settingIp;
         
-//        @ManyToOne(fetch = FetchType.LAZY)
-//        @JsonIgnore
+        private String category;
         @JoinColumn(name = "diagram_id")
         private Integer diagramId;
 }
