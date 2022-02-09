@@ -26,7 +26,7 @@ import lombok.Setter;
 @Setter
 public class TopologyNode {
     
-//        @Id  
+
 //        @SequenceGenerator(initialValue = 1,name="topology_node_seqs", sequenceName="topology_node_seqs", allocationSize=1)
 //        @GeneratedValue(generator="stat_network_seqs")
         @Id

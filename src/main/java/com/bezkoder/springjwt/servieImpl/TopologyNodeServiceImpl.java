@@ -1,15 +1,12 @@
 package com.bezkoder.springjwt.servieImpl;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -19,13 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bezkoder.springjwt.common.HistoryUtils;
 import com.bezkoder.springjwt.models.DiagramGroup;
-import com.bezkoder.springjwt.models.Equipment;
-import com.bezkoder.springjwt.models.TopologyImage;
 import com.bezkoder.springjwt.models.TopologyLink;
 import com.bezkoder.springjwt.models.TopologyNode;
 import com.bezkoder.springjwt.repository.DiagramGroupRepository;
@@ -33,10 +26,6 @@ import com.bezkoder.springjwt.repository.TopologyImageRepository;
 import com.bezkoder.springjwt.repository.TopologyLinkRepository;
 import com.bezkoder.springjwt.repository.TopologyNodeRepository;
 import com.bezkoder.springjwt.service.TopologyNodeService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.qos.logback.core.joran.conditional.IfAction;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -47,7 +36,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     private final TopologyNodeRepository topologyNodeRepository;
     private final TopologyLinkRepository topologyLinkRepository;
     private final DiagramGroupRepository diagramGroupRepository;
-    private final TopologyImageRepository topologyImageRepository;
     
     @Override
     public Map<String, Object> getTopologyNode(Integer diagramId) {
@@ -152,7 +140,7 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
             String absolutePath = new File("").getAbsolutePath() + "\\";
             String path = "src/main/resources/static/";
             
-            File fileSave = new File(path); // ex) fileId.jpg
+            File fileSave = new File(path); 
             if(!fileSave.exists()) {
                 fileSave.mkdirs();
             }
@@ -185,7 +173,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     @Transactional
     @Override
     public List<DiagramGroup> insertDiagramGroup(String diagramGroup) {
-        System.out.println(diagramGroup);
         JSONObject obj = new JSONObject(diagramGroup);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         LocalDateTime date = LocalDateTime.now().withNano(0);
@@ -211,8 +198,6 @@ public class TopologyNodeServiceImpl implements TopologyNodeService {
     @Transactional
     @Override
     public List<DiagramGroup> updateDiagramGroup(String diagramGroup) {
-        System.out.println(diagramGroup);
-        
         JSONObject obj = new JSONObject(diagramGroup);
         DiagramGroup dGroup = diagramGroupRepository.findOne(obj.getInt("id"));
         dGroup.setId(obj.getInt("id"));
