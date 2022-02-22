@@ -1,16 +1,9 @@
 package com.bezkoder.springjwt.servieImpl;
 
 import java.io.ByteArrayInputStream;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
@@ -24,21 +17,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
-import com.bezkoder.springjwt.common.Constants;
-import com.bezkoder.springjwt.common.HistoryUtils;
-import com.bezkoder.springjwt.models.Equipment;
-import com.bezkoder.springjwt.models.Group;
 import com.bezkoder.springjwt.models.HistoryRecord;
-import com.bezkoder.springjwt.models.Role;
 import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.repository.GroupEquipmentJoinRepository;
-import com.bezkoder.springjwt.repository.GroupRepository;
 import com.bezkoder.springjwt.repository.HistoryRecordRepository;
 import com.bezkoder.springjwt.service.HistoryService;
 

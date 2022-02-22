@@ -16,9 +16,9 @@ public class RoleController {
 	}
 	
 	@GetMapping("/user")
-	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public String userAccess() {
-		return "유저 페이지";
+		return "관리 페이지";
 	}
 
 	@GetMapping("/mod")
