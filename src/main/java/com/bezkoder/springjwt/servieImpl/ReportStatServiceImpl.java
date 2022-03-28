@@ -56,8 +56,6 @@ import com.bezkoder.springjwt.repository.StatNetworkRepository;
 import com.bezkoder.springjwt.repository.StatSysRepository;
 import com.bezkoder.springjwt.service.ReportStatService;
 import com.fasterxml.jackson.core.JsonParser;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.PdfGraphics2D;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
