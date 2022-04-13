@@ -3,7 +3,6 @@
 - Eclipse
 - Postman
 - GitHub
-- SourceTree
 - pgAdmin
 - Visual Studio Code
 
@@ -94,6 +93,7 @@ React와 SpringBoot 프레임워크는 처음이었지만 코드를 직접 치�
 
 ### 사람이 알아볼 수 있는 단위 변환
 
+
 차트에서 데이터가 574946913328bytes 이면 방대한 숫자이기 때문에 사람이 읽을 수 없다.
 
 574946913328byte를 읽을 수 있는 단위로 바꾸면 66.93GB 이다.
@@ -104,6 +104,7 @@ React와 SpringBoot 프레임워크는 처음이었지만 코드를 직접 치�
 
 [**HighChart 정리**](https://coor.tistory.com/18?category=983645)
 
+
 ### 폴더와 장비 레벨 구현
 
 폴더 안에 폴더,장비 또 폴더 안에 폴더를 넣을 수 있는 무한 depth 성질을 가지므로 재귀 함수를 써서 구현하였다.
@@ -113,6 +114,7 @@ React와 SpringBoot 프레임워크는 처음이었지만 코드를 직접 치�
 
 **[Rc-Tree 정리](https://coor.tistory.com/17?category=983645)**
 
+
 ### Scroll Event를 통해 무한 스크롤
 
 방대한 데이터를 가져오면 웹에 무리가 올 수 있으므로 스크롤에 따라서 데이터를 30개씩 가져오도록 설계하였습니다.
@@ -120,6 +122,7 @@ React와 SpringBoot 프레임워크는 처음이었지만 코드를 직접 치�
 **[Scroll Event를 통해 무한 스크롤](https://github.com/coorr/react-jwt-equip/blob/a875a5d9b70f623f6f5a9a9372d739215ce1fe12/src/components/deviceManage/history-record.js#L380)**
 
 **[AG-grid 정리](https://coor.tistory.com/15?category=983645)**
+
 
 ## ****기본적인 게시물 CRUD****
 
@@ -129,6 +132,7 @@ AG-Grid 라이브러리 안에 폴더와 장비들을 조회할 수 있고 삭�
 
 삭제와 수정 같은 경우는 쉽게 변경할 수 있도록 Tree 라이브러리 안에서 변경할 수 있도록 하였습니다. 
 
+
 ## 관리자 페이지
 
 일반 사용자가 관리자의 페이지를 조회할 수 없게 삼항 연산자를 통해서 접근 막아두었습니다.
@@ -137,7 +141,7 @@ AG-Grid 라이브러리 안에 폴더와 장비들을 조회할 수 있고 삭�
 
 **[관리자 페이지](https://github.com/coorr/react-jwt-equip/blob/a875a5d9b70f623f6f5a9a9372d739215ce1fe12/src/App.js#L218)**
 
-## 
+
 
 # Learned
 
@@ -148,6 +152,8 @@ AG-Grid 라이브러리 안에 폴더와 장비들을 조회할 수 있고 삭�
 - `Scroll Event`를 통해 데이터 핸들링을 해보았음
 - `byte`단위 데이터를 B/s, KB/s, MB/s, GB/s 사람이 알아볼 수 있는 단위로 변경
 - `PDF`, `Excel` 파일 출력을 서버에서 라이브러리를 통해서 구현
+
+
 
 ## 문제점 및 해결
 
@@ -178,7 +184,7 @@ AG-Grid 라이브러리 안에 폴더와 장비들을 조회할 수 있고 삭�
 Bootstrap, AG-Gird, goJS, Rc-tree, Highchart, POI, jfreechart, orsonpdf 등 라이브러리를 통해 기능들을 만들 수 있었다. 라이브러리를 검색하고 시각적으로 대충 어떤 기능을 하는지 보고 다운로드하여서 쓰면 나중에 요구사항에 맞는 기능이 없는 문제점이 생겼다. 라이브러리를 찾는 것도 중요하지만 요구사항에 맞는 API를 제공하는지 튜토리얼은 잘 구성되어 있는지 만약 그 기능이 없으면 내가 코드를 작성할 수 있는 기능인지 생각한 다음 라이브러리를 써야 한다는 것을 깨달았다. 그러면 삽질하는 시간이 줄어들고 생산성이 증가하기 때문이다. 기존 제품에는 Z-tree 라이브러리를 통해 만들었지만 나는 Rc-tree를 통해 충분한 기능들을 만들 수 있었다.
 
 
-
+ 
 # Screenshot
 ![image](https://github.com/coorr/Algorithm/blob/main/img/record_gif.gif)
 ![image](https://github.com/coorr/Algorithm/blob/main/img/report.png)
