@@ -82,6 +82,9 @@
 
 Bootstrap, AG-Gird, goJS, Rc-tree, Highchart, POI, jfreechart, orsonpdf 등 라이브러리를 통해 기능들을 만들 수 있었다. 라이브러리를 검색하고 시각적으로 대충 어떤 기능을 하는지 보고 다운받아서 쓰면 나중에 요구사항에 맞는 기능이 없는 문제점이 생겼다. 라이브러리를 찾는 것도 중요하지만 요구사항에 맞는 API를 제공하는지 튜토리얼은 잘 구성되어 있는지 만약 그 기능이 없으면 내가 코드를 작성할 수 있는 기능인지 생각한 다음 라이브러리를 써야한다는 것을 깨달았다. 그러면 삽질하는 시간이 줄어들고 생산성이 증가하기 때문이다. 기존 제품에는 Z-tree 라이브러리를 통해 만들었지만 나는 Rc-tree를 통해 충분한 기능들을 만들 수 있었다.
 
+# ⚙️ ERD
+![image](https://github.com/coorr/Algorithm/blob/main/img/aiwacs_ERD.drawio.png)
+
 # 📷 Screenshot
 ![image](https://github.com/coorr/Algorithm/blob/main/img/report.png)
 ![image](https://github.com/coorr/Algorithm/blob/main/img/equipment_manage.png)
