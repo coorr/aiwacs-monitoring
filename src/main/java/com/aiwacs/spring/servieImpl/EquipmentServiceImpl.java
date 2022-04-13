@@ -32,6 +32,7 @@ import com.aiwacs.spring.models.Equipment;
 import com.aiwacs.spring.payload.request.EquipmentRequest;
 import com.aiwacs.spring.payload.response.MessageResponse;
 import com.aiwacs.spring.repository.EquipmentRepository;
+import com.aiwacs.spring.repository.GroupRepository;
 import com.aiwacs.spring.service.EquipmentService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,6 @@ import lombok.RequiredArgsConstructor;
 public class EquipmentServiceImpl implements EquipmentService{
 
    private final EquipmentRepository equipmentRepository;
-   
 
     @Transactional
     @Override
