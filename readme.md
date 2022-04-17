@@ -142,6 +142,18 @@ React와 SpringBoot 프레임워크는 처음이었지만 코드를 직접 치�
 
 <br/>
 
+### PDF, Excel 출력을 통해 데이터 조회 및 삽입
+
+사용자의 로그 기록과 하드웨어 사용량, 장비들을 파일 출력을 통해 조회할 수 있고 한 개씩 등록되는 장비의 불편함을 엑셀을 통해 방대한 데이터를 한꺼번에 삽입할 수 있게 설계하였습니다. 
+
+클라이언트 < 서버에서 설계하여 빠르게 출력할 수 있게 하였고 POI, itext 라이브러리를 통해 구현하였습니다.
+
+[**PDF 코드**](https://github.com/coorr/spring-boot-aiwacs/blob/37e4a07e5376738555b1894315454eb4b1f1dcf8/src/main/java/com/aiwacs/spring/servieImpl/ReportStatServiceImpl.java#L153)       [**PDF 변환하기**](https://coor.tistory.com/19?category=995537)
+
+[**Excel 코드**](https://github.com/coorr/spring-boot-aiwacs/blob/37e4a07e5376738555b1894315454eb4b1f1dcf8/src/main/java/com/aiwacs/spring/servieImpl/EquipmentServiceImpl.java#L191)     [**Excel 출력하기**](https://coor.tistory.com/22?category=995537)
+
+<br/>
+
 ### 기본적인 게시물 CRUD
 
 게시물에 대한 기본적인 CRUD를 모두 구현하였습니다.
