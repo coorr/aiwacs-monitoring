@@ -58,6 +58,18 @@ Front - **[링크](https://github.com/coorr/react-jwt-equip)**
 <br/>
 <br/>
 
+# Screenshot
+![image](https://github.com/coorr/Algorithm/blob/main/img/record_gif.gif)
+![image](https://github.com/coorr/Algorithm/blob/main/img/report.png)
+![image](https://github.com/coorr/Algorithm/blob/main/img/equipment_manage.png)
+![image](https://github.com/coorr/Algorithm/blob/main/img/equipment_group_manage.png)
+![image](https://github.com/coorr/Algorithm/blob/main/img/history_record.png)
+![image](https://github.com/coorr/Algorithm/blob/main/img/topology.png)
+![image](https://github.com/coorr/Algorithm/blob/main/img/file_print.png)
+
+<br/>
+<br/>
+
 ## **핵심 키워드**
 
 - 상세 모니터링
@@ -224,13 +236,4 @@ Bootstrap, AG-Gird, goJS, Rc-tree, Highchart, POI, jfreechart, orsonpdf 등 라�
 
 <br/>
 <br/>
- 
-# Screenshot
-![image](https://github.com/coorr/Algorithm/blob/main/img/record_gif.gif)
-![image](https://github.com/coorr/Algorithm/blob/main/img/report.png)
-![image](https://github.com/coorr/Algorithm/blob/main/img/equipment_manage.png)
-![image](https://github.com/coorr/Algorithm/blob/main/img/equipment_group_manage.png)
-![image](https://github.com/coorr/Algorithm/blob/main/img/history_record.png)
-![image](https://github.com/coorr/Algorithm/blob/main/img/topology.png)
-![image](https://github.com/coorr/Algorithm/blob/main/img/file_print.png)
 
